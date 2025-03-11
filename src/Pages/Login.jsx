@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 // import Navbar from '../components/Navbar';
 
 const Login = () => {
@@ -116,9 +117,9 @@ const Login = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <a href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
                 Sign up
-              </a>
+              </Link>
             </p>
           </div>
         </div>

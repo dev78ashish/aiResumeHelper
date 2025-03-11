@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 // import Navbar from '../components/Navbar';
 
 const Signup = () => {
@@ -56,7 +57,7 @@ const Signup = () => {
                   type="text"
                   required
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  placeholder="Enter your full name"
+                  placeholder="Enter your username"
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 />
@@ -136,9 +137,9 @@ const Signup = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <a href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500" >
                 Sign in
-              </a>
+              </Link>
             </p>
           </div>
         </div>
