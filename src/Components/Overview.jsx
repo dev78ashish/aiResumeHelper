@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Upload, CheckCircle, AlertCircle, Award, Briefcase, GraduationCap, Code } from 'lucide-react';
+import { FileText, Upload, CheckCircle, AlertCircle, Award, Briefcase, GraduationCap, Code, Trash2, FileUp, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import pdfToText from 'react-pdftotext';
 import ReactMarkdown from 'react-markdown';
@@ -10,6 +10,9 @@ function Overview() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showExtractedText, setShowExtractedText] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [activeTab, setActiveTab] = useState('summary');
 
   const handleFileUpload = async (event) => {
     const uploadedFile = event.target.files[0];
@@ -23,6 +26,17 @@ function Overview() {
     setFile(uploadedFile);
     setError('');
     setLoading(true);
+    
+    // Simulate upload progress for better UX
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 300);
 
     try {
       // Extract text from PDF
@@ -32,7 +46,16 @@ function Overview() {
 
       // Analyze with Gemini AI
       await analyzeResume(cleanedText);
+      
+      // Complete progress
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      
+      // Reset progress after animation completes
+      setTimeout(() => setUploadProgress(0), 800);
     } catch (err) {
+      clearInterval(progressInterval);
+      setUploadProgress(0);
       setError('Failed to process resume. Please try again.');
       console.error(err);
     } finally {
@@ -84,7 +107,6 @@ function Overview() {
 
       // Get AI response
       const aiResponse = response.data.candidates[0].content.parts[0].text;
-      console.log("Raw AI response:", aiResponse); // Add logging for debugging
       
       // Improved section extraction with more reliable regex patterns
       const extractBetweenHeadings = (text, heading, nextHeadings) => {
@@ -131,10 +153,7 @@ function Overview() {
           .join('');
           
         sections[key] = content;
-        console.log(content)
       });
-      
-      // console.log("Extracted sections:", sections); // Add logging for debugging
 
       // Parse score - look for a number between 0-100
       const scoreMatch = sections.overallScore ? sections.overallScore.match(/\b([0-9]{1,3})\b/) : null;
@@ -180,8 +199,6 @@ function Overview() {
         recommendedRoles: recommendedRoles
       };
 
-      // console.log("Structured analysis:", structuredAnalysis); // Add logging for debugging
-
       setAnalysis(structuredAnalysis);
     } catch (error) {
       console.error("Error analyzing resume with AI:", error);
@@ -189,28 +206,46 @@ function Overview() {
     }
   };
 
+  const getScoreColor = (score) => {
+    if (score >= 80) return { bg: 'bg-emerald-100', text: 'text-emerald-700', ring: 'ring-emerald-400' };
+    if (score >= 60) return { bg: 'bg-amber-100', text: 'text-amber-700', ring: 'ring-amber-400' };
+    return { bg: 'bg-red-100', text: 'text-red-700', ring: 'ring-red-400' };
+  };
+
+  const scoreColors = analysis ? getScoreColor(analysis.score) : { bg: '', text: '', ring: '' };
+
+  // Modified tab array - removed improvements tab
+  const tabs = [
+    { id: 'summary', icon: <Briefcase />, label: 'Summary' },
+    { id: 'skills', icon: <Code />, label: 'Skills' },
+    { id: 'experience', icon: <Award />, label: 'Experience' },
+    { id: 'education', icon: <GraduationCap />, label: 'Education' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">AI Resume Helper</h1>
-          <p className="mt-2 text-lg text-gray-600">
-            Upload your resume and get AI-powered analysis and suggestions
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-2">
+            AI Resume Helper
+          </h1>
+          <p className="mt-2 text-lg text-gray-600 max-w-2xl mx-auto">
+            Upload your resume and get AI-powered analysis and suggestions to land your dream job
           </p>
         </div>
 
         {/* Upload Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8 transform transition-all hover:shadow-lg">
           <div className="flex items-center justify-center">
             {!file ? (
               <div className="w-full">
-                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 transition-colors">
+                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 transition-colors">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-12 h-12 text-gray-400 mb-3" />
-                    <p className="mb-2 text-sm text-gray-500">
+                    <Upload className="w-16 h-16 text-blue-500 mb-4" />
+                    <p className="mb-2 text-lg font-medium text-blue-700">
                       <span className="font-semibold">Click to upload</span> or drag and drop
                     </p>
-                    <p className="text-xs text-gray-500">PDF (MAX. 10MB)</p>
+                    <p className="text-sm text-blue-600">PDF (MAX. 10MB)</p>
                   </div>
                   <input
                     type="file"
@@ -221,13 +256,23 @@ function Overview() {
                 </label>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
-                <FileText className="w-8 h-8 text-blue-500" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                  <p className="text-xs text-gray-500">
+              <div className="flex items-center space-x-4 w-full">
+                <div className="w-16 h-16 flex-shrink-0 bg-blue-100 rounded-full flex items-center justify-center">
+                  <FileText className="w-8 h-8 text-blue-600" />
+                </div>
+                <div className="flex-grow">
+                  <p className="text-lg font-medium text-gray-900">{file.name}</p>
+                  <p className="text-sm text-gray-500">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
+                  {uploadProgress > 0 && uploadProgress < 100 && (
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" 
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={() => {
@@ -235,9 +280,10 @@ function Overview() {
                     setExtractedText('');
                     setAnalysis(null);
                   }}
-                  className="text-sm text-red-600 hover:text-red-500"
+                  className="flex items-center px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
                 >
-                  Remove
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  <span className="text-sm font-medium">Remove</span>
                 </button>
               </div>
             )}
@@ -246,126 +292,56 @@ function Overview() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 rounded-lg flex items-center">
-            <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="mb-8 p-4 bg-red-50 rounded-lg border border-red-200 flex items-center animate-pulse">
+            <AlertCircle className="w-6 h-6 text-red-500 mr-3" />
+            <p className="text-sm font-medium text-red-600">{error}</p>
           </div>
         )}
 
         {/* Loading State */}
         {loading && (
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+          <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-              <p className="ml-3 text-sm text-blue-600">Analyzing your resume...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <p className="ml-4 text-base font-medium text-blue-700">Analyzing your resume with AI...</p>
             </div>
           </div>
         )}
 
         {/* Analysis Results */}
         {analysis && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Score Card */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">Resume Analysis</h2>
-                <div className={`text-2xl font-bold px-4 py-2 rounded-full ${
-                  analysis.score >= 80 ? 'bg-green-100 text-green-700' :
-                  analysis.score >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                  'bg-red-100 text-red-700'
-                }`}>
-                  {analysis.score}/100
+            <div className="bg-white rounded-xl shadow-md p-8 transition-all transform hover:shadow-lg">
+              <div className="flex flex-col md:flex-row items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4 md:mb-0">Resume Analysis</h2>
+                <div className="flex items-center">
+                  <div className={`flex items-center justify-center ${scoreColors.bg} ${scoreColors.text} text-3xl font-bold w-24 h-24 rounded-full ring-4 ${scoreColors.ring} transform transition-all hover:scale-105`}>
+                    {analysis.score}
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-500">Resume Score</p>
+                    <p className={`text-lg font-semibold ${scoreColors.text}`}>
+                      {analysis.score >= 80 ? 'Excellent!' : 
+                       analysis.score >= 60 ? 'Good' : 'Needs Work'}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Professional Summary */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center mb-4">
-                <Briefcase className="w-5 h-5 text-blue-500 mr-2" />
-                <h2 className="text-lg font-medium text-gray-900">Professional Summary</h2>
-              </div>
-              <div className="prose max-w-none">
-                <ReactMarkdown>{analysis.summary}</ReactMarkdown>
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center mb-4">
-                <Code className="w-5 h-5 text-blue-500 mr-2" />
-                <h2 className="text-lg font-medium text-gray-900">Key Skills</h2>
-              </div>
-              <div className="prose max-w-none">
-                <ReactMarkdown>{analysis.skills}</ReactMarkdown>
-              </div>
-            </div>
-
-            {/* Experience */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center mb-4">
-                <Award className="w-5 h-5 text-blue-500 mr-2" />
-                <h2 className="text-lg font-medium text-gray-900">Experience Highlights</h2>
-              </div>
-              <div className="prose max-w-none">
-                <ReactMarkdown>{analysis.experience}</ReactMarkdown>
-              </div>
-            </div>
-
-            {/* Education */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center mb-4">
-                <GraduationCap className="w-5 h-5 text-blue-500 mr-2" />
-                <h2 className="text-lg font-medium text-gray-900">Education</h2>
-              </div>
-              <div className="prose max-w-none">
-                <ReactMarkdown>{analysis.education}</ReactMarkdown>
-              </div>
-            </div>
-
-            {/* Improvement Suggestions */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Suggested Improvements
-              </h2>
-              <div className="space-y-4">
-                {analysis.suggestions.length > 0 ? (
-                  analysis.suggestions.map((suggestion, index) => (
-                    <div key={index} className="flex items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span className="text-sm font-medium text-blue-600">
-                          {index + 1}
-                        </span>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-900">
-                          {suggestion.title}
-                        </p>
-                        {suggestion.description && (
-                          <p className="mt-1 text-sm text-gray-500">
-                            {suggestion.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-500">No specific improvements suggested.</p>
-                )}
-              </div>
-            </div>
-
+            
             {/* Recommended Roles */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white rounded-xl shadow-md p-6 transition-all transform hover:shadow-lg">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <Award className="w-5 h-5 text-indigo-500 mr-2" />
                 Recommended Job Roles
               </h2>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mt-4">
                 {analysis.recommendedRoles.length > 0 ? (
                   analysis.recommendedRoles.map((role, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                      className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 border border-indigo-200 transform transition-all hover:-translate-y-1 hover:shadow"
                     >
                       {role}
                     </span>
@@ -375,20 +351,118 @@ function Overview() {
                 )}
               </div>
             </div>
+
+            {/* Tabbed Content */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+              {/* Tab Navigation */}
+              <div className="flex overflow-x-auto border-b border-gray-200 bg-gray-50">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center py-4 px-6 space-x-2 font-medium text-sm transition-all ${
+                      activeTab === tab.id
+                        ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <span className={activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'}>
+                      {tab.icon}
+                    </span>
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab Content */}
+              <div className="p-6">
+                {activeTab === 'summary' && (
+                  <div className="prose max-w-none">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Professional Summary</h3>
+                    <ReactMarkdown>{analysis.summary}</ReactMarkdown>
+                  </div>
+                )}
+
+                {activeTab === 'skills' && (
+                  <div className="prose max-w-none">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Key Skills</h3>
+                    <ReactMarkdown>{analysis.skills}</ReactMarkdown>
+                  </div>
+                )}
+
+                {activeTab === 'experience' && (
+                  <div className="prose max-w-none">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Experience Highlights</h3>
+                    <ReactMarkdown>{analysis.experience}</ReactMarkdown>
+                  </div>
+                )}
+
+                {activeTab === 'education' && (
+                  <div className="prose max-w-none">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Education</h3>
+                    <ReactMarkdown>{analysis.education}</ReactMarkdown>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Improvements Section - Now below tabs instead of as a tab */}
+            <div className="bg-white rounded-xl shadow-md p-6 transition-all transform hover:shadow-lg">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <Sparkles className="w-5 h-5 text-blue-500 mr-2" />
+                Suggested Improvements
+              </h2>
+              <div className="space-y-4">
+                {analysis.suggestions.length > 0 ? (
+                  analysis.suggestions.map((suggestion, index) => (
+                    <div key={index} className="flex items-start p-4 rounded-lg bg-blue-50 border border-blue-100 transform transition-all hover:shadow hover:bg-blue-100">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                        <span className="text-sm font-medium">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-base font-medium text-gray-900">
+                          {suggestion.title}
+                        </p>
+                        {suggestion.description && (
+                          <p className="mt-1 text-sm text-gray-600">
+                            {suggestion.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-4">No specific improvements suggested.</p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Extracted Text (Hidden by default) */}
+        {/* Extracted Text (Toggle) */}
         {extractedText && (
-          <div className="mt-6">
-            <details className="bg-white rounded-lg shadow-sm">
-              <summary className="p-4 cursor-pointer text-sm text-gray-600 hover:text-gray-900">
-                View Extracted Text
-              </summary>
-              <pre className="p-4 text-sm text-gray-600 whitespace-pre-wrap border-t border-gray-200">
+          <div className="mt-8">
+            <button 
+              onClick={() => setShowExtractedText(!showExtractedText)}
+              className="flex items-center justify-between w-full p-4 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+            >
+              <span className="flex items-center text-sm text-gray-600">
+                <FileText className="w-4 h-4 mr-2 text-gray-500" />
+                <span>Extracted Resume Text</span>
+              </span>
+              {showExtractedText ? 
+                <ChevronUp className="w-5 h-5 text-gray-500" /> : 
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              }
+            </button>
+            
+            {showExtractedText && (
+              <div className="mt-2 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 whitespace-pre-wrap">
                 {extractedText}
-              </pre>
-            </details>
+              </div>
+            )}
           </div>
         )}
       </div>

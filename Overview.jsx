@@ -72,7 +72,6 @@ function Overview() {
         "Overall Score:"
         "Improvement Suggestions:"
         "Recommended Job Roles:"
-        "New Changes:"
 
         Here's the resume:
 
@@ -91,6 +90,15 @@ function Overview() {
       const extractBetweenHeadings = (text, heading, nextHeadings) => {
         // Create a regex that looks for the heading and captures all content until one of the next headings
         const headingPattern = heading.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        
+        // For the last heading, we don't need to look for next headings
+        if (nextHeadings.length === 0) {
+          const regex = new RegExp(`${headingPattern}:?\\s*([\\s\\S]*)$`, "i");
+          const match = text.match(regex);
+          return match ? match[1].trim() : '';
+        }
+        
+        // For other headings, look for next headings
         const nextHeadingsPattern = nextHeadings
           .map(h => h.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"))
           .join("|");
@@ -108,8 +116,7 @@ function Overview() {
         "Education Overview",
         "Overall Score",
         "Improvement Suggestions",
-        "Recommended Job Roles",
-        "New Changes"
+        "Recommended Job Roles"
       ];
 
       // Extract each section by looking ahead to the next possible headings

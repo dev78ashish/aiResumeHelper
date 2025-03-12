@@ -5,7 +5,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 // import Navbar from '../components/Navbar';
 
-const Login = () => {
+const Login = ({showAlert}) => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
@@ -28,6 +28,7 @@ const Login = () => {
         localStorage.setItem("token", response.data);
         login();
         navigate("/");
+        showAlert("Welcome!", "success");
       } else {
         throw new Error("Invalid response format. Token not found.");
       }
