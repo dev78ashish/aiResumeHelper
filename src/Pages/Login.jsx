@@ -1,25 +1,52 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../Context/AuthContext';
 // import Navbar from '../components/Navbar';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    username: ''
+    username: '',
+    password: ''
   });
+
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    const url = `${import.meta.env.VITE_APP_URL}/public/signup`
-
-
-    await axios.post()
+    const url = `${import.meta.env.VITE_APP_URL}/public/login`;
+  
+    try {
+      const response = await axios.post(url, formData);
+      
+      // Check if the response contains a valid token
+      if (response.data && response.data) {
+        localStorage.setItem("token", response.data);
+        login();
+        navigate("/");
+      } else {
+        throw new Error("Invalid response format. Token not found.");
+      }
+  
+    } catch (error) {
+      // Handle different types of errors
+      if (error.response) {
+        // Server responded with a status code outside the 2xx range
+        console.error("Server Error:", error.response.data);
+      } else if (error.request) {
+        // Request was made, but no response received
+        console.error("Network Error:", error.request);
+      } else {
+        // Something else went wrong
+        console.error("Error:", error.message);
+      }
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -52,23 +79,6 @@ const Login = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="email"
-                  required
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -92,15 +102,6 @@ const Login = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label className="ml-2 block text-sm text-gray-700">
-                  Remember me
-                </label>
-              </div>
               <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
                 Forgot password?
               </a>

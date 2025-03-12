@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-// import Navbar from '../components/Navbar';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -20,6 +20,7 @@ const Signup = () => {
     try {
         const response = await axios.post(url, formData);
         console.log("Response:", response.data);
+        navigate("/login");
     } catch (error) {
         if (error.response) {
             // Server responded with a status other than 2xx
