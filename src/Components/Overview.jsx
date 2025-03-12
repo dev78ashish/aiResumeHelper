@@ -3,6 +3,7 @@ import { FileText, Upload, CheckCircle, AlertCircle, Award, Briefcase, Graduatio
 import axios from 'axios';
 import pdfToText from 'react-pdftotext';
 import ReactMarkdown from 'react-markdown';
+import { cleanObject, cleanResumeText, getScoreColor, removeAsterisks, removeAsterisksFromArray } from './helper';
 
 function Overview() {
   const [file, setFile] = useState(null);
@@ -63,17 +64,7 @@ function Overview() {
     }
   };
 
-  const cleanResumeText = (text) => {
-    let cleaned = text.replace(/\n{3,}/g, '\n\n');
-    
-    const sections = ['experience', 'education', 'skills', 'projects', 'certifications', 'contact'];
-    sections.forEach(section => {
-      const regex = new RegExp(`(^|\\n)(${section}|${section.toUpperCase()}):?`, 'i');
-      cleaned = cleaned.replace(regex, `\n\n## ${section.toUpperCase()} ##\n`);
-    });
-    
-    return cleaned;
-  };
+  
 
   const analyzeResume = async (text) => {
     try {
@@ -195,10 +186,17 @@ function Overview() {
         experience: sections.experienceHighlights || '',
         education: sections.educationOverview || '',
         score: score,
-        suggestions: suggestions,
-        recommendedRoles: recommendedRoles
+        suggestions: cleanObject(suggestions),
+        recommendedRoles: removeAsterisksFromArray(recommendedRoles)
       };
 
+      // console.log(structuredAnalysis.summary)
+      // console.log(structuredAnalysis.skills)
+      // console.log(structuredAnalysis.experience)
+      // console.log(structuredAnalysis.education)
+      // console.log(structuredAnalysis.score)
+      // console.log(structuredAnalysis.suggestions)
+      // console.log(removeAsterisksFromArray(structuredAnalysis.recommendedRoles))
       setAnalysis(structuredAnalysis);
     } catch (error) {
       console.error("Error analyzing resume with AI:", error);
@@ -206,11 +204,7 @@ function Overview() {
     }
   };
 
-  const getScoreColor = (score) => {
-    if (score >= 80) return { bg: 'bg-emerald-100', text: 'text-emerald-700', ring: 'ring-emerald-400' };
-    if (score >= 60) return { bg: 'bg-amber-100', text: 'text-amber-700', ring: 'ring-amber-400' };
-    return { bg: 'bg-red-100', text: 'text-red-700', ring: 'ring-red-400' };
-  };
+ 
 
   const scoreColors = analysis ? getScoreColor(analysis.score) : { bg: '', text: '', ring: '' };
 
@@ -386,7 +380,7 @@ function Overview() {
                 {activeTab === 'skills' && (
                   <div className="prose max-w-none">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Key Skills</h3>
-                    <ReactMarkdown>{analysis.skills}</ReactMarkdown>
+                    <ReactMarkdown>{removeAsterisks(analysis.skills)}</ReactMarkdown>
                   </div>
                 )}
 

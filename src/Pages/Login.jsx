@@ -25,7 +25,7 @@ const Login = ({showAlert}) => {
       
       // Check if the response contains a valid token
       if (response.data && response.data) {
-        localStorage.setItem("token", response.data);
+        sessionStorage.setItem("token", response.data);
         login();
         navigate("/");
         showAlert("Welcome!", "success");
