@@ -1,38 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import {
   Briefcase,
-  LineChart,
-  CheckCircle,
   Bell,
   User,
   Search,
   FileText,
   BarChart,
-  Star,
-  Award,
-  Calendar,
-  Clock,
-  ArrowUp,
-  ArrowDown,
-  PieChart,
   SettingsIcon,
   Menu,
-  X,
-  Home,
-  ChevronRight
+  LogOut
 } from 'lucide-react';
 import Overview from '../Components/Overview';
 import Settings from '../Components/Settings';
 import Profile from '../Components/Profile';
 import Jobs from '../Components/Jobs';
 import Applications from '../Components/Applications';
+import axios from 'axios';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [userName, setUserName] = useState('Alex');
   const [timeOfDay, setTimeOfDay] = useState('');
-
+  const [allDetails, setAllDetails] = useState(null);
 
   const navItems = [
     { id: 'overview', name: 'Overview', icon: <BarChart className="h-5 w-5" /> },
@@ -41,6 +32,26 @@ const Dashboard = () => {
     { id: 'profile', name: 'Profile', icon: <User className="h-5 w-5" /> },
     { id: 'settings', name: 'Settings', icon: <SettingsIcon className="h-5 w-5" /> }
   ];
+
+  const fetchInfo = async () => {
+    const url = `${import.meta.env.VITE_APP_URL}/userinfo`;
+    const token = sessionStorage.getItem("token");
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      });
+      setAllDetails(response.data);
+      console.log(response.data)
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  useEffect(() => {
+    fetchInfo();
+  }, []);
 
   useEffect(() => {
     // Set time of day greeting
@@ -55,6 +66,13 @@ const Dashboard = () => {
   }, []);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen);
+
+  const handleLogout = () => {
+    // Add logout functionality here
+    sessionStorage.removeItem("token");
+    // Redirect to login page or handle logout as needed
+  };
 
   const renderTab = () => {
     switch (activeTab) {
@@ -63,20 +81,18 @@ const Dashboard = () => {
       case 'jobs':
         return <Jobs />;
       case 'applications':
-        return (
-          <Applications />
-        );
+        return <Applications />;
       case 'profile':
-        return <Profile />;
+        return <Profile allDetails={allDetails} />;
       case 'settings':
-        return <Settings />;
+        return <Settings allDetails={allDetails} fetchInfo={fetchInfo} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex bg-gray-100">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -87,42 +103,62 @@ const Dashboard = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
+        className={`fixed inset-y-0 left-0 z-30 w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
-        
-
-        <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
-          <div>
-            
-            {/* Navigation */}
-            <nav className="px-4 py-6 space-y-1">
-              {navItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setSidebarOpen(false);
-                  }}
-                  className={`flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg ${activeTab === item.id
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                >
-                  <span className={`mr-3 ${activeTab === item.id ? 'text-blue-600' : 'text-gray-400'}`}>
-                    {item.icon}
+        <div className="flex flex-col h-full">
+          {/* Navigation */}
+          <nav className="px-4 py-6 space-y-1 flex-grow">
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setSidebarOpen(false);
+                }}
+                className={`flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg ${
+                  activeTab === item.id
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span className={`mr-3 ${activeTab === item.id ? 'text-blue-600' : 'text-gray-400'}`}>
+                  {item.icon}
+                </span>
+                <span>{item.name}</span>
+                {item.id === 'applications' && (
+                  <span className="ml-auto inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-blue-600 rounded-full">
+                    6
                   </span>
-                  <span>{item.name}</span>
-                  {item.id === 'applications' && (
-                    <span className="ml-auto inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-blue-600 rounded-full">
-                      6
-                    </span>
-                  )}
-                </button>
-              ))}
-            </nav>
+                )}
+              </button>
+            ))}
+          </nav>
+
+          {/* User profile in sidebar */}
+          <div className="border-t border-gray-200 p-4">
+            <div className="flex items-center">
+              <img
+                className="h-10 w-10 rounded-full"
+                src="/api/placeholder/50/50"
+                alt="User avatar"
+              />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-700">{userName}</p>
+                <p className="text-xs text-gray-500 truncate">
+                  {allDetails?.email || 'user@example.com'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="mt-4 flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              <span>Log out</span>
+            </button>
           </div>
-          
         </div>
       </aside>
 
@@ -139,7 +175,7 @@ const Dashboard = () => {
                 <Menu className="h-6 w-6" />
               </button>
               <h1 className="ml-3 lg:ml-0 text-xl font-semibold text-gray-800">
-              {timeOfDay}, {userName}!
+                {timeOfDay}, {userName}!
               </h1>
             </div>
 
@@ -158,14 +194,36 @@ const Dashboard = () => {
                 <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
               </button>
 
-              <div className="hidden md:block h-8 w-px bg-gray-200"></div>
-
-              <div className="hidden md:flex items-center">
-                <img
-                  className="h-8 w-8 rounded-full"
-                  src="/api/placeholder/50/50"
-                  alt="User avatar"
-                />
+              {/* User menu for lg:hidden screens */}
+              <div className="lg:hidden relative">
+                <button
+                  onClick={toggleUserMenu}
+                  className="flex items-center"
+                >
+                  <img
+                    className="h-8 w-8 rounded-full"
+                    src="/api/placeholder/50/50"
+                    alt="User avatar"
+                  />
+                </button>
+                
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <p className="text-sm font-medium text-gray-700">{userName}</p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {allDetails?.email || 'user@example.com'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -183,13 +241,13 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Main content area with welcome banner */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-100">
-          <div className="max-w-7xl mx-auto space-y-6">
-           
-            
-            {/* Tab Content */}
-            {renderTab()}
+        {/* Main content area with fixed header and scrollable content */}
+        <main className="flex-1 overflow-hidden bg-gray-100">
+          <div className="h-full max-w-7xl mx-auto p-4 sm:p-6">
+            {/* Tab Content with its own scrollable area */}
+            <div className="h-full overflow-auto">
+              {renderTab()}
+            </div>
           </div>
         </main>
       </div>
