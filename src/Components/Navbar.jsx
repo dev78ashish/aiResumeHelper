@@ -3,10 +3,15 @@ import { Briefcase, Home, LogIn, UserPlus, LogOut, Menu, X, Search, ChevronDown 
 import { Link } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 
-const Navbar = () => {
+const Navbar = ({ showAlert }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
+
+  const handleLogOut = () =>{
+    logout();
+    showAlert("Logout successful!","success");
+  }
   
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -35,7 +40,7 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <button
-                  onClick={logout}
+                  onClick={handleLogOut}
                   className="flex items-center px-4 py-2 rounded-md border border-red-200 text-red-600 font-medium hover:bg-red-50 transition"
                 >
                   <LogOut className="h-5 w-5 mr-1" /> Logout
@@ -80,7 +85,7 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <button
-                  onClick={logout}
+                  onClick={handleLogOut}
                   className="flex items-center py-2 text-red-600 font-medium hover:text-red-500 transition w-full text-left"
                 >
                   <LogOut className="h-5 w-5 mr-2" /> Logout

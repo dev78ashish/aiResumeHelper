@@ -5,10 +5,10 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 // import Navbar from '../components/Navbar';
 
-const Login = ({showAlert}) => {
+const Login = ({ showAlert }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -18,15 +18,15 @@ const Login = ({showAlert}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const url = `${import.meta.env.VITE_APP_URL}/public/login`;
-  
+
     try {
 
       setLoading(true);
-      
+
       const response = await axios.post(url, formData);
-      
+
       // Check if the response contains a valid token
       if (response.data && response.data) {
         sessionStorage.setItem("token", response.data);
@@ -36,7 +36,7 @@ const Login = ({showAlert}) => {
       } else {
         throw new Error("Invalid response format. Token not found.");
       }
-  
+
     } catch (error) {
       // Handle different types of errors
       if (error.response) {
@@ -49,11 +49,11 @@ const Login = ({showAlert}) => {
         // Something else went wrong
         showAlert("Error logging into the account.", "danger");
       }
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
-  
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -109,15 +109,16 @@ const Login = ({showAlert}) => {
             </div>
 
             <div className="flex items-center justify-between">
-              <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+              <Link to='/forgotpassword' className="text-sm font-medium text-blue-600 hover:text-blue-500">
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-indigo-400"
+              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white transition 
+              ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"}`}
             >
               {loading ? (
                 <span className="flex items-center">
@@ -131,6 +132,7 @@ const Login = ({showAlert}) => {
                 "Sign in"
               )}
             </button>
+
           </form>
 
           <div className="mt-6 text-center">

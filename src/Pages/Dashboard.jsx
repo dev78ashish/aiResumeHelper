@@ -16,6 +16,7 @@ import Profile from '../Components/Profile';
 import Jobs from '../Components/Jobs';
 import Applications from '../Components/Applications';
 import axios from 'axios';
+import { useAuth } from '../Context/AuthContext';
 
 const Dashboard = ({ showAlert }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -23,6 +24,7 @@ const Dashboard = ({ showAlert }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState('');
   const [allDetails, setAllDetails] = useState(null);
+  const { logout } = useAuth();
 
   const navItems = [
     { id: 'overview', name: 'Overview', icon: <BarChart className="h-5 w-5" /> },
@@ -68,7 +70,8 @@ const Dashboard = ({ showAlert }) => {
 
   const handleLogout = () => {
     // Add logout functionality here
-    sessionStorage.removeItem("token");
+    logout();
+    showAlert("Logout successful!", "success");
     // Redirect to login page or handle logout as needed
   };
 

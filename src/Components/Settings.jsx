@@ -20,33 +20,35 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
     const [hoveredTab, setHoveredTab] = useState(null);
     const [newDetails, setNewDetails] = useState(allDetails);
     const [showAvatarModal, setShowAvatarModal] = useState(false);
-    
+
     const avatarOptions = [
-        male1, female1, male2, female2, male3, 
+        male1, female1, male2, female2, male3,
         female3, male4, female4, male5, female5
     ];
 
     const handleSave = async () => {
         try {
+            setSaveStatus(true);
             const url = `${import.meta.env.VITE_APP_URL}/userinfo/save`;
             const token = sessionStorage.getItem("token");
-    
+
             if (!token) {
                 console.error("No token found. User might not be authenticated.");
                 return;
             }
-    
+
             const response = await axios.post(url, newDetails, {
                 headers: {
                     Authorization: `Bearer ${token}` // Ensure it's prefixed correctly
                 }
             });
-    
+
             showAlert("Details updated successfully.", "success");
             fetchInfo();
         } catch (error) {
-            console.error("Error saving user details:", error.response?.data || error.message);
             alert("Failed to update profile. Please try again later.");
+        } finally {
+            setSaveStatus(false);
         }
     };
 
@@ -126,7 +128,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                                     type="text"
                                     id="fullName"
                                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
-                                    value={newDetails.fullname}
+                                    value={newDetails.fullname || ""}
                                     onChange={(e) => setNewDetails({ ...newDetails, fullname: e.target.value })}
                                 />
                             </div>
@@ -141,7 +143,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                                 type="tel"
                                 id="phone"
                                 className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
-                                value={newDetails.number}
+                                value={newDetails.number || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, number: e.target.value })}
                             />
                         </div>
@@ -155,7 +157,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                                 type="text"
                                 id="location"
                                 className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
-                                value={newDetails.location}
+                                value={newDetails.location || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, location: e.target.value })}
                             />
                         </div>
@@ -169,7 +171,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                                 type="text"
                                 id="jobTitle"
                                 className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
-                                value={newDetails.title}
+                                value={newDetails.title || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, title: e.target.value })}
                             />
                         </div>
@@ -182,7 +184,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                             <select
                                 id="experience"
                                 className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
-                                value={newDetails.experience}
+                                value={newDetails.experience || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, experience: e.target.value })}
                             >
                                 <option value="<1 Year">&lt;1 Year</option>
@@ -202,7 +204,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                                 type="text"
                                 id="education"
                                 className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
-                                value={newDetails.qualification}
+                                value={newDetails.qualification || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, qualification: e.target.value })}
                                 placeholder="e.g., B.Tech, MCA, MBA"
                             />
@@ -303,7 +305,24 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                         <button
                             type="button"
                             onClick={handleSave}
-                            className="py-2 px-4 border rounded-lg text-white bg-blue-600 hover:bg-blue-700 flex items-center transition-">Save</button>
+                            disabled={saveStatus}
+                            className={`py-2 px-4 border rounded-lg text-white flex items-center transition ${saveStatus
+                                ? "bg-indigo-400 cursor-not-allowed"
+                                : "bg-blue-600 hover:bg-blue-700"
+                                }`}
+                        >
+                            {saveStatus ? (
+                                <>
+                                    <svg className="mr-2 h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Saving...
+                                </>
+                            ) : (
+                                "Save"
+                            )}
+                        </button>
                     </div>
                 </div>
             )}

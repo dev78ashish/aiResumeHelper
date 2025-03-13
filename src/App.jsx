@@ -8,6 +8,7 @@ import Navbar from './Components/Navbar';
 import ProtectedRoute from './Components/ProptectedRoute';
 import Dashboard from './Pages/Dashboard';
 import Alert from './Components/Alert';
+import ForgotPassword from './Pages/ForgotPassword';
 
 
 const App = () => {
@@ -24,11 +25,12 @@ const App = () => {
       <AuthProvider>
         <Router>
           {alert && <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />}
-          <Navbar />
+          <Navbar showAlert={showAlert} />
           <Routes>
             <Route path='/landingpage' element={<LandingPage />} />
             <Route path='/login' element={<Login showAlert={showAlert} />} />
             <Route path='/signup' element={<Signup showAlert={showAlert} />} />
+            <Route path='/forgotpassword' element={<ForgotPassword showAlert={showAlert} />} />
 
             <Route
               path='/'

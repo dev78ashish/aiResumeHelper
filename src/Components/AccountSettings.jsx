@@ -68,6 +68,8 @@ const AccountSettings = ({ showAlert }) => {
 
       showAlert("Email updated successfully.", "success");
       fetchUserInfo();
+      setNewEmail('');
+
     } catch (error) {
       showAlert("Can't update email address.", "danger");
     } finally {
@@ -210,7 +212,7 @@ const AccountSettings = ({ showAlert }) => {
                   type="email"
                   placeholder="Enter new email address"
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  value={newEmail}
+                  value={newEmail || ""}
                   onChange={(e) => {
                     const email = e.target.value;
                     setNewEmail(email);
