@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Briefcase,
   LineChart,
@@ -15,197 +15,183 @@ import {
   ArrowUp,
   ArrowDown,
   PieChart,
-  SettingsIcon
+  SettingsIcon,
+  Menu,
+  X,
+  Home,
+  ChevronRight
 } from 'lucide-react';
 import Overview from '../Components/Overview';
 import Settings from '../Components/Settings';
 import Profile from '../Components/Profile';
 import Jobs from '../Components/Jobs';
+import Applications from '../Components/Applications';
 
 const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userName, setUserName] = useState('Alex');
+  const [timeOfDay, setTimeOfDay] = useState('');
 
-  const [activeTab, setActiveTab] = useState('overview'); 
 
-  const applications = [
-    { id: 1, title: 'Software Engineer', company: 'TechGiant', status: 'Interview', date: 'Mar 15, 2025', logo: '/api/placeholder/50/50' },
-    { id: 2, title: 'Frontend Developer', company: 'WebSolutions', status: 'Application Sent', date: 'Mar 10, 2025', logo: '/api/placeholder/50/50' },
-    { id: 3, title: 'Product Designer', company: 'CreativeInc', status: 'Assessment', date: 'Mar 8, 2025', logo: '/api/placeholder/50/50' }
+  const navItems = [
+    { id: 'overview', name: 'Overview', icon: <BarChart className="h-5 w-5" /> },
+    { id: 'jobs', name: 'Jobs', icon: <Briefcase className="h-5 w-5" /> },
+    { id: 'applications', name: 'Applications', icon: <FileText className="h-5 w-5" /> },
+    { id: 'profile', name: 'Profile', icon: <User className="h-5 w-5" /> },
+    { id: 'settings', name: 'Settings', icon: <SettingsIcon className="h-5 w-5" /> }
   ];
 
- 
+  useEffect(() => {
+    // Set time of day greeting
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      setTimeOfDay('Good morning');
+    } else if (hour >= 12 && hour < 18) {
+      setTimeOfDay('Good afternoon');
+    } else {
+      setTimeOfDay('Good evening');
+    }
+  }, []);
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
-        return(
-          <Overview />
-        );
+        return <Overview />;
       case 'jobs':
-        return (
-          <Jobs />
-        );
+        return <Jobs />;
       case 'applications':
         return (
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Your Applications</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Job
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Applied Date
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Next Steps
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {applications.concat(applications).map((app, index) => (
-                    <tr key={`${app.id}-${index}`} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <img className="h-10 w-10 rounded-md" src={app.logo} alt="" />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{app.title}</div>
-                            <div className="text-sm text-gray-500">{app.company}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{app.date}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${app.status === 'Interview' ? 'bg-green-100 text-green-800' :
-                            app.status === 'Assessment' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-blue-100 text-blue-800'
-                          }`}>
-                          {app.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {app.status === 'Interview' ? 'Prepare for interview' :
-                          app.status === 'Assessment' ? 'Complete assessment' :
-                            'Wait for recruiter response'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="#" className="text-blue-600 hover:text-blue-900 mr-3">View</a>
-                        <a href="#" className="text-gray-600 hover:text-gray-900">Withdraw</a>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <Applications />
         );
       case 'profile':
-        return (
-          <Profile />
-        );
+        return <Profile />;
       case 'settings':
-        return(
-          <Settings />
-        );
+        return <Settings />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Job Search Dashboard</h1>
-          <div className="mt-4 sm:mt-0 flex space-x-2">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg"
-              />
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-            </div>
-            <button className="p-2 text-gray-400 hover:text-gray-500">
-              <Bell className="h-5 w-5" />
-            </button>
-            <button className={`p-2 hover:text-blue-400 ${activeTab ==='settings' ? 'text-blue-400' :'text-gray-400'}`}>
-              <SettingsIcon onClick={() => setActiveTab('settings')} className="h-5 w-5 " />
-            </button>
-          </div>
-        </div>
+    <div className="flex h-screen bg-gray-100">
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 lg:hidden"
+          onClick={toggleSidebar}
+        ></div>
+      )}
 
-        {/* Tabs */}
-        <div className="mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-6">
-              <button
-                onClick={() => setActiveTab('overview')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'overview'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-              >
-                <div className="flex items-center">
-                  <BarChart className="mr-2 h-5 w-5" />
-                  <span>Overview</span>
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('jobs')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'jobs'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-              >
-                <div className="flex items-center">
-                  <Briefcase className="mr-2 h-5 w-5" />
-                  <span>Jobs</span>
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('applications')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'applications'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-              >
-                <div className="flex items-center">
-                  <FileText className="mr-2 h-5 w-5" />
-                  <span>Applications</span>
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'profile'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-              >
-                <div className="flex items-center">
-                  <User className="mr-2 h-5 w-5" />
-                  <span>Profile</span>
-                </div>
-              </button>
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-30 w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+      >
+        
+
+        <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
+          <div>
+            
+            {/* Navigation */}
+            <nav className="px-4 py-6 space-y-1">
+              {navItems.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setSidebarOpen(false);
+                  }}
+                  className={`flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg ${activeTab === item.id
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                >
+                  <span className={`mr-3 ${activeTab === item.id ? 'text-blue-600' : 'text-gray-400'}`}>
+                    {item.icon}
+                  </span>
+                  <span>{item.name}</span>
+                  {item.id === 'applications' && (
+                    <span className="ml-auto inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-blue-600 rounded-full">
+                      6
+                    </span>
+                  )}
+                </button>
+              ))}
             </nav>
           </div>
+          
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        {/* Top navigation */}
+        <header className="bg-white shadow-sm">
+          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center">
+              <button
+                className="p-2 text-gray-500 rounded-md lg:hidden hover:bg-gray-100"
+                onClick={toggleSidebar}
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+              <h1 className="ml-3 lg:ml-0 text-xl font-semibold text-gray-800">
+              {timeOfDay}, {userName}!
+              </h1>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <div className="hidden md:block relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="pl-9 pr-4 py-2 w-full sm:w-64 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              </div>
+
+              <button className="relative p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-full">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
+              </button>
+
+              <div className="hidden md:block h-8 w-px bg-gray-200"></div>
+
+              <div className="hidden md:flex items-center">
+                <img
+                  className="h-8 w-8 rounded-full"
+                  src="/api/placeholder/50/50"
+                  alt="User avatar"
+                />
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Search bar for mobile */}
+        <div className="md:hidden p-4 bg-white border-b border-gray-200">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          </div>
         </div>
 
-        {/* Tab Content */}
-        {renderTab()}
+        {/* Main content area with welcome banner */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-100">
+          <div className="max-w-7xl mx-auto space-y-6">
+           
+            
+            {/* Tab Content */}
+            {renderTab()}
+          </div>
+        </main>
       </div>
     </div>
   );
