@@ -27,7 +27,7 @@ const App = () => {
     <div>
       <AuthProvider>
         <Router>
-        {alert && <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />}
+          {alert && <Alert message={alert.message} type={alert.type} onClose={() => setAlert(null)} />}
           <Navbar />
           <Routes>
             <Route path='/landingpage' element={<LandingPage />} />

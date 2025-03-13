@@ -380,7 +380,7 @@ function Overview() {
                 {activeTab === 'skills' && (
                   <div className="prose max-w-none">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Key Skills</h3>
-                    <ReactMarkdown>{removeAsterisks(analysis.skills)}</ReactMarkdown>
+                    <ReactMarkdown>{analysis.skills}</ReactMarkdown>
                   </div>
                 )}
 

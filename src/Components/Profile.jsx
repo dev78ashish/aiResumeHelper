@@ -1,5 +1,6 @@
 import { ArrowUp, Award, FileText } from 'lucide-react';
 import React from 'react';
+import image from '../assets/avatar/avatar (1).gif';
 
 const Profile = () => {
     const skillMetrics = [
@@ -9,16 +10,7 @@ const Profile = () => {
         { name: 'Node.js', level: 70, trending: true },
         { name: 'Tailwind CSS', level: 80, trending: true }
       ];
-    
-      const activityData = [
-        { day: 'Mon', applications: 2, views: 12 },
-        { day: 'Tue', applications: 1, views: 8 },
-        { day: 'Wed', applications: 3, views: 15 },
-        { day: 'Thu', applications: 2, views: 10 },
-        { day: 'Fri', applications: 4, views: 20 },
-        { day: 'Sat', applications: 1, views: 5 },
-        { day: 'Sun', applications: 0, views: 3 }
-      ];
+
     return (
         <div className="space-y-6">
             <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -28,9 +20,9 @@ const Profile = () => {
                 <div className="p-6">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                         <img
-                            src="/api/placeholder/128/128"
+                            src={image}
                             alt="Profile"
-                            className="h-24 w-24 rounded-full border-2 border-blue-500"
+                            className="h-20 w-20 rounded-full border-2 border-black-500 p-2"
                         />
                         <div>
                             <h3 className="text-xl font-medium text-gray-900">Alex Johnson</h3>
@@ -95,33 +87,6 @@ const Profile = () => {
                 </div>
             </div>
 
-            {/* Resume Section */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900">Resume</h3>
-                </div>
-                <div className="p-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                            <div className="flex-shrink-0 bg-blue-100 p-2 rounded-lg">
-                                <FileText className="h-6 w-6 text-blue-600" />
-                            </div>
-                            <div>
-                                <p className="text-gray-900 font-medium">Alex_Johnson_Resume.pdf</p>
-                                <p className="text-sm text-gray-500">Updated 2 weeks ago</p>
-                            </div>
-                        </div>
-                        <div className="flex space-x-2">
-                            <button className="text-sm text-gray-600 hover:text-gray-500 border border-gray-300 rounded-md px-3 py-1">
-                                View
-                            </button>
-                            <button className="text-sm text-blue-600 hover:text-blue-500 border border-blue-600 rounded-md px-3 py-1">
-                                Update
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* Skills Section */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
