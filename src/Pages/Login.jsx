@@ -7,6 +7,7 @@ import { useAuth } from '../Context/AuthContext';
 
 const Login = ({showAlert}) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
     username: '',
@@ -21,6 +22,9 @@ const Login = ({showAlert}) => {
     const url = `${import.meta.env.VITE_APP_URL}/public/login`;
   
     try {
+
+      setLoading(true);
+      
       const response = await axios.post(url, formData);
       
       // Check if the response contains a valid token
@@ -28,7 +32,7 @@ const Login = ({showAlert}) => {
         sessionStorage.setItem("token", response.data);
         login();
         navigate("/");
-        showAlert("Welcome!", "success");
+        showAlert(`Welcome, ${formData.username}!`, "success");
       } else {
         throw new Error("Invalid response format. Token not found.");
       }
@@ -37,14 +41,16 @@ const Login = ({showAlert}) => {
       // Handle different types of errors
       if (error.response) {
         // Server responded with a status code outside the 2xx range
-        console.error("Server Error:", error.response.data);
+        showAlert("Error logging into the account.", "danger");
       } else if (error.request) {
         // Request was made, but no response received
-        console.error("Network Error:", error.request);
+        showAlert("Error logging into the account.", "danger");
       } else {
         // Something else went wrong
-        console.error("Error:", error.message);
+        showAlert("Error logging into the account.", "danger");
       }
+    } finally{
+      setLoading(false);
     }
   };
   
@@ -110,9 +116,20 @@ const Login = ({showAlert}) => {
 
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={loading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-indigo-400"
             >
-              Sign in
+              {loading ? (
+                <span className="flex items-center">
+                  <svg className="mr-2 h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing in...
+                </span>
+              ) : (
+                "Sign in"
+              )}
             </button>
           </form>
 

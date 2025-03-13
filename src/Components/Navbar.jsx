@@ -9,7 +9,7 @@ const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
   
   return (
-    <nav className="bg-white shadow-sm top-0 z-50">
+    <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -67,31 +67,12 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white py-4 px-4 shadow-lg">
-          <div className="relative mb-4">
-            <input
-              type="text"
-              placeholder="Search jobs..."
-              className="pl-9 pr-4 py-2 w-full text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          </div>
-          
+        <div className="md:hidden bg-white py-4 px-4 shadow-lg">          
           <div className="space-y-3">
             <Link to="/" className="flex items-center py-2 text-gray-700 hover:text-blue-600 transition">
               <Home className="h-5 w-5 mr-2" /> Home
             </Link>
             
-            <button 
-              onClick={() => {/* Toggle mobile resources dropdown */}}
-              className="flex items-center py-2 text-gray-700 hover:text-blue-600 transition w-full text-left"
-            >
-              Resources <ChevronDown className="h-4 w-4 ml-1" />
-            </button>
-            
-            <Link to="/pricing" className="flex items-center py-2 text-gray-700 hover:text-blue-600 transition">
-              Pricing
-            </Link>
             
             {isAuthenticated ? (
               <>

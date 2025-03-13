@@ -3,32 +3,33 @@ import { Eye, EyeOff, Mail, Lock, User, Check, X } from 'lucide-react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-const Signup = () => {
+const Signup = ({ showAlert }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     username: ''
   });
-  
+
   // Username validation states
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
   const [usernameMessage, setUsernameMessage] = useState('');
-  
+
   // Password validation states
   const [passwordValidation, setPasswordValidation] = useState({
     hasMinLength: false,
     hasNumber: false
   });
-  
+
   // Form validation state
   const [isFormValid, setIsFormValid] = useState(false);
-  
+
   // Debounce timer for username check
   const [usernameTimer, setUsernameTimer] = useState(null);
-  
+
   // Check username availability with the updated endpoint
   const checkUsernameAvailability = async (username) => {
     if (!username || username.length < 3) {
@@ -36,14 +37,14 @@ const Signup = () => {
       setUsernameMessage('Username must be at least 3 characters');
       return;
     }
-    
+
     setIsCheckingUsername(true);
-    
+
     try {
       const response = await axios.get(`${import.meta.env.VITE_APP_URL}/public/exist`, {
         params: { username: username }
       });
-      
+
       // API now returns "yes" if username exists, "no" if available
       const exists = response.data === "yes";
       setIsUsernameAvailable(!exists);
@@ -56,17 +57,17 @@ const Signup = () => {
       setIsCheckingUsername(false);
     }
   };
-  
+
   // Handle username input with debounce
   const handleUsernameChange = (e) => {
     const newUsername = e.target.value;
     setFormData({ ...formData, username: newUsername });
-    
+
     // Clear any existing timer
     if (usernameTimer) {
       clearTimeout(usernameTimer);
     }
-    
+
     // Only check availability if username has at least 3 characters
     if (newUsername.length >= 3) {
       setIsCheckingUsername(true);
@@ -80,73 +81,78 @@ const Signup = () => {
       setUsernameMessage(newUsername.length > 0 ? 'Username must be at least 3 characters' : '');
     }
   };
-  
+
   // Validate password criteria
   const validatePassword = (password) => {
     const hasMinLength = password.length >= 5;
     const hasNumber = /\d/.test(password);
-    
+
     setPasswordValidation({
       hasMinLength,
       hasNumber
     });
-    
+
     return hasMinLength && hasNumber;
   };
-  
+
   // Handle password change
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
     setFormData({ ...formData, password: newPassword });
     validatePassword(newPassword);
   };
-  
+
   // Check overall form validity
   useEffect(() => {
     const isValidUsername = isUsernameAvailable === true;
     const isValidPassword = passwordValidation.hasMinLength && passwordValidation.hasNumber;
     const isValidEmail = /\S+@\S+\.\S+/.test(formData.email);
-    
+
     setIsFormValid(isValidUsername && isValidPassword && isValidEmail);
   }, [isUsernameAvailable, passwordValidation, formData.email]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!isFormValid) {
       return;
     }
 
+    setLoading(true);
+
     const url = `${import.meta.env.VITE_APP_URL}/public/signup`;
 
     try {
-        const response = await axios.post(url, formData);
-        console.log("Response:", response.data);
-        navigate("/login");
+      const response = await axios.post(url, formData);
+      console.log("Response:", response.data);
+      navigate("/login");
+      showAlert(`Account created successfully with username: ${formData.username}`, "success");
     } catch (error) {
-        if (error.response) {
-            // Server responded with a status other than 2xx
-            console.error("Error Response:", error.response.data);
-        } else if (error.request) {
-            // Request was made but no response received
-            console.error("No Response:", error.request);
-        } else {
-            // Something else happened while setting up the request
-            console.error("Error Message:", error.message);
-        }
+      if (error.response) {
+        // Server responded with a status other than 2xx
+        showAlert("Error creating account.", "danger");
+      } else if (error.request) {
+        // Request was made but no response received
+        showAlert("Error creating account.", "danger");
+      } else {
+        // Something else happened while setting up the request
+        showAlert("Error creating account.", "danger");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      
+
       <div className="max-w-md mx-auto px-4 py-16">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900">Create an account</h2>
             <p className="text-gray-600 mt-2">Start your journey with SkillSync</p>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -157,13 +163,12 @@ const Signup = () => {
                 <input
                   type="text"
                   required
-                  className={`block w-full pl-10 pr-10 py-2 border ${
-                    isUsernameAvailable === true
+                  className={`block w-full pl-10 pr-10 py-2 border ${isUsernameAvailable === true
                       ? 'border-green-500 focus:ring-green-500'
                       : isUsernameAvailable === false
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 focus:ring-blue-600'
-                  } rounded-lg focus:ring-2 focus:border-transparent`}
+                        ? 'border-red-500 focus:ring-red-500'
+                        : 'border-gray-300 focus:ring-blue-600'
+                    } rounded-lg focus:ring-2 focus:border-transparent`}
                   placeholder="Enter your username"
                   value={formData.username}
                   onChange={handleUsernameChange}
@@ -180,18 +185,17 @@ const Signup = () => {
                 ) : null}
               </div>
               {usernameMessage && (
-                <p className={`mt-2 text-sm ${
-                  isUsernameAvailable === true
+                <p className={`mt-2 text-sm ${isUsernameAvailable === true
                     ? 'text-green-600'
                     : isUsernameAvailable === false
-                    ? 'text-red-600'
-                    : 'text-gray-500'
-                }`}>
+                      ? 'text-red-600'
+                      : 'text-gray-500'
+                  }`}>
                   {usernameMessage}
                 </p>
               )}
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email address
@@ -208,7 +212,7 @@ const Signup = () => {
                 />
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -241,7 +245,7 @@ const Signup = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -259,20 +263,29 @@ const Signup = () => {
                 </a>
               </label>
             </div>
-            
+
             <button
               type="submit"
-              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white ${
-                isFormValid
+              className={`disabled:bg-indigo-400 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white ${isFormValid
                   ? 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
                   : 'bg-gray-400 cursor-not-allowed'
-              }`}
-              disabled={!isFormValid}
+                }`}
+              disabled={loading || !isFormValid}
             >
-              Create account
+              {loading ? (
+                <span className="flex items-center">
+                  <svg className="mr-2 h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating account...
+                </span>
+              ) : (
+                "Create Account"
+              )}
             </button>
           </form>
-          
+
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}

@@ -13,7 +13,7 @@ import female5 from '../assets/avatar/female5.gif';
 import axios from 'axios';
 import AccountSettings from './AccountSettings';
 
-const Settings = ({ allDetails, fetchInfo }) => {
+const Settings = ({ allDetails, fetchInfo, showAlert }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [activeTab, setActiveTab] = useState('account');
     const [saveStatus, setSaveStatus] = useState(null);
@@ -42,8 +42,7 @@ const Settings = ({ allDetails, fetchInfo }) => {
                 }
             });
     
-            console.log("Save successful:", response.data);
-            alert("Profile updated successfully!"); // You can replace this with a toast notification
+            showAlert("Details updated successfully.", "success");
             fetchInfo();
         } catch (error) {
             console.error("Error saving user details:", error.response?.data || error.message);
@@ -312,7 +311,7 @@ const Settings = ({ allDetails, fetchInfo }) => {
 
             {/* Security Tab */}
             {activeTab === 'security' && (
-                <AccountSettings />
+                <AccountSettings showAlert={showAlert} />
             )}
 
         </div>

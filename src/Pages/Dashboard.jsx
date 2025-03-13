@@ -17,11 +17,10 @@ import Jobs from '../Components/Jobs';
 import Applications from '../Components/Applications';
 import axios from 'axios';
 
-const Dashboard = () => {
+const Dashboard = ({ showAlert }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [userName, setUserName] = useState('Alex');
   const [timeOfDay, setTimeOfDay] = useState('');
   const [allDetails, setAllDetails] = useState(null);
 
@@ -43,7 +42,6 @@ const Dashboard = () => {
         },
       });
       setAllDetails(response.data);
-      console.log(response.data)
     } catch (e) {
       console.log(e);
     }
@@ -77,22 +75,22 @@ const Dashboard = () => {
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview />;
+        return <Overview showAlert={showAlert} />;
       case 'jobs':
-        return <Jobs />;
+        return <Jobs showAlert={showAlert} />;
       case 'applications':
-        return <Applications />;
+        return <Applications showAlert={showAlert} />;
       case 'profile':
-        return <Profile allDetails={allDetails} />;
+        return <Profile allDetails={allDetails} showAlert={showAlert} />;
       case 'settings':
-        return <Settings allDetails={allDetails} fetchInfo={fetchInfo} />;
+        return <Settings allDetails={allDetails} fetchInfo={fetchInfo} showAlert={showAlert} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="flex bg-gray-100">
+    <div className="flex max-h-[calc(100vh-64px)] bg-gray-100">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -137,17 +135,17 @@ const Dashboard = () => {
           </nav>
 
           {/* User profile in sidebar */}
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-gray-200 p-4 text-blue-600 bg-blue-50">
             <div className="flex items-center">
               <img
                 className="h-10 w-10 rounded-full"
-                src="/api/placeholder/50/50"
-                alt="User avatar"
+                src={allDetails?.avatar ||  null}
+                alt="User icon"
               />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700">{userName}</p>
-                <p className="text-xs text-gray-500 truncate">
-                  {allDetails?.email || 'user@example.com'}
+                <p className="text-base font-medium">{allDetails?.fullname || "Set your name"}</p>
+                <p className="text-xs truncate">
+                  {allDetails?.username || 'user@example.com'}
                 </p>
               </div>
             </div>
@@ -175,7 +173,7 @@ const Dashboard = () => {
                 <Menu className="h-6 w-6" />
               </button>
               <h1 className="ml-3 lg:ml-0 text-xl font-semibold text-gray-800">
-                {timeOfDay}, {userName}!
+                {timeOfDay}, {allDetails?.fullname || "user"}!
               </h1>
             </div>
 
@@ -202,7 +200,7 @@ const Dashboard = () => {
                 >
                   <img
                     className="h-8 w-8 rounded-full"
-                    src="/api/placeholder/50/50"
+                    src={allDetails?.avatar|| null}
                     alt="User avatar"
                   />
                 </button>
@@ -210,9 +208,9 @@ const Dashboard = () => {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                     <div className="px-4 py-2 border-b border-gray-200">
-                      <p className="text-sm font-medium text-gray-700">{userName}</p>
+                      <p className="text-sm font-medium text-gray-700">{allDetails?.fullname || ""}</p>
                       <p className="text-xs text-gray-500 truncate">
-                        {allDetails?.email || 'user@example.com'}
+                        {allDetails?.username || 'null'}
                       </p>
                     </div>
                     <button
