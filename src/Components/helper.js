@@ -43,18 +43,18 @@ export const cleanObject = (arr) => {
 
 export const parseAllDetails = (detailsText) => {
     if (!detailsText) return {};
-    
+
     const details = {};
     const lines = detailsText.split('\n').filter(line => line.trim());
-    
+
     lines.forEach(line => {
-      const parts = line.split(':');
-      if (parts.length >= 2) {
-        const key = parts[0].trim().toLowerCase().replace(/\s+/g, '_');
-        const value = parts.slice(1).join(':').trim();
-        details[key] = value !== "Not specified" ? value : "";
-      }
+        const parts = line.split(':');
+        if (parts.length >= 2) {
+            const key = parts[0].trim().toLowerCase().replace(/\s+/g, '_');
+            const value = parts.slice(1).join(':').trim();
+            details[key] = value !== "Not specified" ? value : "";
+        }
     });
-    
+
     return details;
-  };
+};

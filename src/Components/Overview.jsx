@@ -5,7 +5,7 @@ import pdfToText from 'react-pdftotext';
 import ReactMarkdown from 'react-markdown';
 import { cleanObject, cleanResumeText, getScoreColor, parseAllDetails, removeAsterisksFromArray } from './helper';
 
-function Overview() {
+function Overview({ showAlert, fetchInfo }) {
   const [file, setFile] = useState(null);
   const [extractedText, setExtractedText] = useState('');
   const [analysis, setAnalysis] = useState(null);
@@ -221,10 +221,10 @@ function Overview() {
   // Modified tab array - removed improvements tab
   const tabs = [
     { id: 'summary', icon: <Briefcase />, label: 'Summary' },
+    { id: 'details', icon: <FileText />, label: 'Personal Info' },
     { id: 'skills', icon: <Code />, label: 'Skills' },
     { id: 'experience', icon: <Award />, label: 'Experience' },
     { id: 'education', icon: <GraduationCap />, label: 'Education' },
-    { id: 'details', icon: <FileText />, label: 'Personal Info' },
   ];
 
   // Add these state variables to your component
@@ -233,25 +233,63 @@ function Overview() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  // Simulate the saving process (replace with actual save logic)
-  useEffect(() => {
-    if (isSaving) {
-      // Simulate API call or database save
-      const timer = setTimeout(() => {
+
+  const personalDetails = {
+    jobRoles: analysis?.recommendedRoles || [],
+    fullname: analysis?.details?.full_name || '',
+    location: analysis?.details?.current_location || '',
+    number: analysis?.details?.phone || '',
+    title: analysis?.details?.current_role || '',
+    qualification: analysis?.details?.highest_education_qualification || '',
+    availability: analysis?.details?.availability || '',
+    experience: analysis?.details?.experience_in_years || '',
+  };
+
+
+  const handleSave = async (personalDetails) => {
+    try {
+      setIsSaving(true);
+      
+      const url = `${import.meta.env.VITE_APP_URL}/userinfo/save`;
+      const token = sessionStorage.getItem("token");
+  
+      if (!token) {
+        console.error("No token found. User might not be authenticated.");
+        showAlert("Authentication required. Please login to save your details.", "error");
         setIsSaving(false);
-        setIsSaved(true);
-
-        // Optional: Reset the saved state after some time
-        const resetTimer = setTimeout(() => {
-          setIsSaved(false);
-        }, 3000);
-
-        return () => clearTimeout(resetTimer);
-      }, 1500);
-
-      return () => clearTimeout(timer);
+        return;
+      }
+  
+      const response = await axios.post(url, personalDetails, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      console.log("Save response:", response.data);
+      
+      // Set success state
+      setIsSaving(false);
+      setIsSaved(true);
+      showAlert("Personal details saved successfully.", "success");
+      
+      // Reset saved state after some time
+      setTimeout(() => {
+        setIsSaved(false);
+      }, 3000);
+      fetchInfo();
+    } catch (error) {
+      console.error("Failed to save personal information:", error);
+      showAlert("Failed to update profile. Please try again later.", "error");
+      setIsSaving(false);
     }
-  }, [isSaving]);
+  };
+  
+  // Button click handler for the confirm button
+  const handleConfirmSave = () => {
+    setShowConfirm(false);
+    handleSave(personalDetails);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -463,10 +501,7 @@ function Overview() {
                           <div className="flex items-center space-x-2">
                             <span className="text-sm text-gray-600">Confirm save?</span>
                             <button
-                              onClick={() => {
-                                setShowConfirm(false);
-                                setIsSaving(true);
-                              }}
+                              onClick={handleConfirmSave}
                               className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
                             >
                               Confirm

@@ -78,7 +78,7 @@ const Dashboard = ({ showAlert }) => {
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview showAlert={showAlert} />;
+        return <Overview showAlert={showAlert} fetchInfo={fetchInfo} />;
       case 'jobs':
         return <Jobs showAlert={showAlert} />;
       case 'applications':
