@@ -28,15 +28,33 @@ export const removeAsterisksFromArray = (arr) => {
 
 export const cleanObject = (arr) => {
     if (!Array.isArray(arr)) {
-      console.error("Expected an array but received:", typeof arr, arr);
-      return [];
+        console.error("Expected an array but received:", typeof arr, arr);
+        return [];
     }
-  
+
     return arr
-      .map(({ title, description }) => ({
-        title: title.replace(/\*/g, "").trim(),
-        description: description.replace(/\*/g, "").trim(),
-      }))
-      .filter(({ title, description }) => title !== "" || description !== ""); // Remove empty objects
+        .map(({ title, description }) => ({
+            title: title.replace(/\*/g, "").trim(),
+            description: description.replace(/\*/g, "").trim(),
+        }))
+        .filter(({ title, description }) => title !== "" || description !== ""); // Remove empty objects
+};
+
+
+export const parseAllDetails = (detailsText) => {
+    if (!detailsText) return {};
+    
+    const details = {};
+    const lines = detailsText.split('\n').filter(line => line.trim());
+    
+    lines.forEach(line => {
+      const parts = line.split(':');
+      if (parts.length >= 2) {
+        const key = parts[0].trim().toLowerCase().replace(/\s+/g, '_');
+        const value = parts.slice(1).join(':').trim();
+        details[key] = value !== "Not specified" ? value : "";
+      }
+    });
+    
+    return details;
   };
-  

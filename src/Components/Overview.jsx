@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FileText, Upload, CheckCircle, AlertCircle, Award, Briefcase, GraduationCap, Code, Trash2, FileUp, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import pdfToText from 'react-pdftotext';
 import ReactMarkdown from 'react-markdown';
-import { cleanObject, cleanResumeText, getScoreColor, removeAsterisks, removeAsterisksFromArray } from './helper';
+import { cleanObject, cleanResumeText, getScoreColor, parseAllDetails, removeAsterisksFromArray } from './helper';
 
 function Overview() {
   const [file, setFile] = useState(null);
@@ -27,7 +27,7 @@ function Overview() {
     setFile(uploadedFile);
     setError('');
     setLoading(true);
-    
+
     // Simulate upload progress for better UX
     const progressInterval = setInterval(() => {
       setUploadProgress(prev => {
@@ -47,11 +47,11 @@ function Overview() {
 
       // Analyze with Gemini AI
       await analyzeResume(cleanedText);
-      
+
       // Complete progress
       clearInterval(progressInterval);
       setUploadProgress(100);
-      
+
       // Reset progress after animation completes
       setTimeout(() => setUploadProgress(0), 800);
     } catch (err) {
@@ -64,7 +64,7 @@ function Overview() {
     }
   };
 
-  
+
 
   const analyzeResume = async (text) => {
     try {
@@ -77,7 +77,15 @@ function Overview() {
         5. Overall Score (0-100) based on resume quality
         6. Improvement Suggestions (specific areas to enhance)
         7. Recommended Job Roles (based on experience and skills)
-
+        8. Personal Details (provide in exactly this format with one detail per line):
+           Full Name: [name]
+           Phone: [phone]
+           Current Location: [location]
+           Current Role: [role]
+           Experience(in years): [years]
+           Highest Education Qualification: [qualification]
+           Availability: [availability]
+          
         Format the response in clear sections with exactly these headings:
         "Professional Summary:"
         "Key Skills:"
@@ -86,9 +94,12 @@ function Overview() {
         "Overall Score:"
         "Improvement Suggestions:"
         "Recommended Job Roles:"
-
+        "Personal Details:"
+          
+        For Personal Details, maintain the exact format specified above. If information is not available, use "Not specified" as the value.
+          
         Here's the resume:
-
+          
         ${text}
       `;
 
@@ -99,24 +110,24 @@ function Overview() {
       // Get AI response
       const aiResponse = response.data.candidates[0].content.parts[0].text;
       console.log(aiResponse)
-      
+
       // Improved section extraction with more reliable regex patterns
       const extractBetweenHeadings = (text, heading, nextHeadings) => {
         // Create a regex that looks for the heading and captures all content until one of the next headings
         const headingPattern = heading.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-        
+
         // For the last heading, we don't need to look for next headings
         if (nextHeadings.length === 0) {
           const regex = new RegExp(`${headingPattern}:?\\s*([\\s\\S]*)$`, "i");
           const match = text.match(regex);
           return match ? match[1].trim() : '';
         }
-        
+
         // For other headings, look for next headings
         const nextHeadingsPattern = nextHeadings
           .map(h => h.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"))
           .join("|");
-        
+
         const regex = new RegExp(`${headingPattern}:?\\s*([\\s\\S]*?)(?=(${nextHeadingsPattern}):?|$)`, "i");
         const match = text.match(regex);
         return match ? match[1].trim() : '';
@@ -130,7 +141,8 @@ function Overview() {
         "Education Overview",
         "Overall Score",
         "Improvement Suggestions",
-        "Recommended Job Roles"
+        "Recommended Job Roles",
+        "Personal Details"
       ];
 
       // Extract each section by looking ahead to the next possible headings
@@ -138,12 +150,12 @@ function Overview() {
       allHeadings.forEach((heading, index) => {
         const nextHeadings = allHeadings.slice(index + 1);
         const content = extractBetweenHeadings(aiResponse, heading, nextHeadings);
-        
+
         // Convert heading to camelCase for object keys
         const key = heading.split(' ')
           .map((word, i) => i === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
           .join('');
-          
+
         sections[key] = content;
       });
 
@@ -152,35 +164,38 @@ function Overview() {
       const score = scoreMatch ? parseInt(scoreMatch[1]) : 70;
 
       // Process suggestions to create a structured array
-      const suggestions = sections.improvementSuggestions 
+      const suggestions = sections.improvementSuggestions
         ? sections.improvementSuggestions
-            .split('\n')
-            .filter(line => line.trim())
-            .map(suggestion => {
-              const parts = suggestion.split(':');
-              if (parts.length > 1) {
-                return {
-                  title: parts[0].trim().replace(/^[•\-\d.]+\s*/, ''),
-                  description: parts.slice(1).join(':').trim()
-                };
-              } else {
-                return {
-                  title: suggestion.replace(/^[•\-\d.]+\s*/, '').trim(),
-                  description: ''
-                };
-              }
-            })
+          .split('\n')
+          .filter(line => line.trim())
+          .map(suggestion => {
+            const parts = suggestion.split(':');
+            if (parts.length > 1) {
+              return {
+                title: parts[0].trim().replace(/^[•\-\d.]+\s*/, ''),
+                description: parts.slice(1).join(':').trim()
+              };
+            } else {
+              return {
+                title: suggestion.replace(/^[•\-\d.]+\s*/, '').trim(),
+                description: ''
+              };
+            }
+          })
         : [];
 
       // Process recommended roles to create an array
       const recommendedRoles = sections.recommendedJobRoles
         ? sections.recommendedJobRoles
-            .split(/[•\n,]/)
-            .map(role => role.trim())
-            .filter(role => role && !role.match(/^[0-9.]+$/))
+          .split(/[•\n,]/)
+          .map(role => role.trim())
+          .filter(role => role && !role.match(/^[0-9.]+$/))
         : [];
 
       // Create final structured analysis object
+      const personalDetails = parseAllDetails(sections.personalDetails);
+
+      // Update the final structured analysis object to include details
       const structuredAnalysis = {
         summary: sections.professionalSummary || '',
         skills: sections.keySkills || '',
@@ -188,16 +203,10 @@ function Overview() {
         education: sections.educationOverview || '',
         score: score,
         suggestions: cleanObject(suggestions),
-        recommendedRoles: removeAsterisksFromArray(recommendedRoles)
+        recommendedRoles: removeAsterisksFromArray(recommendedRoles),
+        details: personalDetails // Add the personal details object
       };
 
-      // console.log(structuredAnalysis.summary)
-      // console.log(structuredAnalysis.skills)
-      // console.log(structuredAnalysis.experience)
-      // console.log(structuredAnalysis.education)
-      // console.log(structuredAnalysis.score)
-      // console.log(structuredAnalysis.suggestions)
-      // console.log(removeAsterisksFromArray(structuredAnalysis.recommendedRoles))
       setAnalysis(structuredAnalysis);
     } catch (error) {
       console.error("Error analyzing resume with AI:", error);
@@ -205,7 +214,7 @@ function Overview() {
     }
   };
 
- 
+
 
   const scoreColors = analysis ? getScoreColor(analysis.score) : { bg: '', text: '', ring: '' };
 
@@ -215,7 +224,34 @@ function Overview() {
     { id: 'skills', icon: <Code />, label: 'Skills' },
     { id: 'experience', icon: <Award />, label: 'Experience' },
     { id: 'education', icon: <GraduationCap />, label: 'Education' },
+    { id: 'details', icon: <FileText />, label: 'Personal Info' },
   ];
+
+  // Add these state variables to your component
+  const [showNotice, setShowNotice] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  // Simulate the saving process (replace with actual save logic)
+  useEffect(() => {
+    if (isSaving) {
+      // Simulate API call or database save
+      const timer = setTimeout(() => {
+        setIsSaving(false);
+        setIsSaved(true);
+
+        // Optional: Reset the saved state after some time
+        const resetTimer = setTimeout(() => {
+          setIsSaved(false);
+        }, 3000);
+
+        return () => clearTimeout(resetTimer);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isSaving]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -262,8 +298,8 @@ function Overview() {
                   </p>
                   {uploadProgress > 0 && uploadProgress < 100 && (
                     <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
-                      <div 
-                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" 
+                      <div
+                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
                         style={{ width: `${uploadProgress}%` }}
                       ></div>
                     </div>
@@ -317,14 +353,14 @@ function Overview() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-500">Resume Score</p>
                     <p className={`text-lg font-semibold ${scoreColors.text}`}>
-                      {analysis.score >= 80 ? 'Excellent!' : 
-                       analysis.score >= 60 ? 'Good' : 'Needs Work'}
+                      {analysis.score >= 80 ? 'Excellent!' :
+                        analysis.score >= 60 ? 'Good' : 'Needs Work'}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             {/* Recommended Roles */}
             <div className="bg-white rounded-xl shadow-md p-6 transition-all transform hover:shadow-lg">
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
@@ -355,11 +391,10 @@ function Overview() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center py-4 px-6 space-x-2 font-medium text-sm transition-all ${
-                      activeTab === tab.id
-                        ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                    }`}
+                    className={`flex items-center py-4 px-6 space-x-2 font-medium text-sm transition-all ${activeTab === tab.id
+                      ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                      }`}
                   >
                     <span className={activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'}>
                       {tab.icon}
@@ -396,6 +431,78 @@ function Overview() {
                   <div className="prose max-w-none">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Education</h3>
                     <ReactMarkdown>{analysis.education}</ReactMarkdown>
+                  </div>
+                )}
+
+                {activeTab === 'details' && (
+                  <div className="prose max-w-none">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-medium text-gray-900">Personal Information</h3>
+                      <div className="space-x-2">
+                        {!showNotice && !showConfirm && !isSaving && !isSaved ? (
+                          <button
+                            onClick={() => setShowNotice(true)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                          >
+                            Save Details
+                          </button>
+                        ) : showNotice ? (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-600">Your details will be saved in our database which you can change later.</span>
+                            <button
+                              onClick={() => {
+                                setShowNotice(false);
+                                setShowConfirm(true);
+                              }}
+                              className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                            >
+                              Continue
+                            </button>
+                          </div>
+                        ) : showConfirm ? (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-600">Confirm save?</span>
+                            <button
+                              onClick={() => {
+                                setShowConfirm(false);
+                                setIsSaving(true);
+                              }}
+                              className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              onClick={() => {
+                                setShowNotice(false);
+                                setShowConfirm(false);
+                              }}
+                              className="px-3 py-1 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors text-sm"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : isSaving ? (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-600">Saving...</span>
+                            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <span className="text-sm text-green-600 font-medium">Saved successfully!</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {analysis.details && Object.entries(analysis.details).map(([key, value]) => (
+                        <div key={key} className="flex flex-col p-3 bg-gray-50 rounded-lg">
+                          <span className="text-sm text-gray-500 capitalize">
+                            {key.replace(/_/g, ' ')}
+                          </span>
+                          <span className="font-medium">{value || 'Not specified'}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -439,7 +546,7 @@ function Overview() {
         {/* Extracted Text (Toggle) */}
         {extractedText && (
           <div className="mt-8">
-            <button 
+            <button
               onClick={() => setShowExtractedText(!showExtractedText)}
               className="flex items-center justify-between w-full p-4 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
             >
@@ -447,12 +554,12 @@ function Overview() {
                 <FileText className="w-4 h-4 mr-2 text-gray-500" />
                 <span>Extracted Resume Text</span>
               </span>
-              {showExtractedText ? 
-                <ChevronUp className="w-5 h-5 text-gray-500" /> : 
+              {showExtractedText ?
+                <ChevronUp className="w-5 h-5 text-gray-500" /> :
                 <ChevronDown className="w-5 h-5 text-gray-500" />
               }
             </button>
-            
+
             {showExtractedText && (
               <div className="mt-2 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 whitespace-pre-wrap">
                 {extractedText}
