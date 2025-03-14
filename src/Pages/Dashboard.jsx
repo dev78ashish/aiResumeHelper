@@ -4,7 +4,6 @@ import {
   Bell,
   User,
   Search,
-  FileText,
   BarChart,
   SettingsIcon,
   Menu,
