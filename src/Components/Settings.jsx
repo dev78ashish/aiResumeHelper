@@ -53,7 +53,6 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
     };
 
     const handleAvatarSelect = (avatar) => {
-        console.log(avatar)
         setNewDetails({ ...newDetails, avatar });
         setShowAvatarModal(false);
     };

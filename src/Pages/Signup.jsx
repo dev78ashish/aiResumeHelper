@@ -124,7 +124,7 @@ const Signup = ({ showAlert }) => {
 
     try {
       const response = await axios.post(url, formData);
-      console.log("Response:", response.data);
+      // console.log("Response:", response.data);
       navigate("/login");
       showAlert(`Account created successfully with username: ${formData.username}`, "success");
     } catch (error) {

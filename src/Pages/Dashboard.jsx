@@ -14,7 +14,6 @@ import Overview from '../Components/Overview';
 import Settings from '../Components/Settings';
 import Profile from '../Components/Profile';
 import Jobs from '../Components/Jobs';
-import Applications from '../Components/Applications';
 import axios from 'axios';
 import { useAuth } from '../Context/AuthContext';
 
@@ -29,7 +28,6 @@ const Dashboard = ({ showAlert }) => {
   const navItems = [
     { id: 'overview', name: 'Overview', icon: <BarChart className="h-5 w-5" /> },
     { id: 'jobs', name: 'Jobs', icon: <Briefcase className="h-5 w-5" /> },
-    { id: 'applications', name: 'Applications', icon: <FileText className="h-5 w-5" /> },
     { id: 'profile', name: 'Profile', icon: <User className="h-5 w-5" /> },
     { id: 'settings', name: 'Settings', icon: <SettingsIcon className="h-5 w-5" /> }
   ];
@@ -81,8 +79,6 @@ const Dashboard = ({ showAlert }) => {
         return <Overview showAlert={showAlert} fetchInfo={fetchInfo} />;
       case 'jobs':
         return <Jobs showAlert={showAlert} />;
-      case 'applications':
-        return <Applications showAlert={showAlert} />;
       case 'profile':
         return <Profile allDetails={allDetails} showAlert={showAlert} />;
       case 'settings':
@@ -128,11 +124,6 @@ const Dashboard = ({ showAlert }) => {
                   {item.icon}
                 </span>
                 <span>{item.name}</span>
-                {item.id === 'applications' && (
-                  <span className="ml-auto inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-blue-600 rounded-full">
-                    6
-                  </span>
-                )}
               </button>
             ))}
           </nav>

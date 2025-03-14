@@ -109,7 +109,6 @@ function Overview({ showAlert, fetchInfo }) {
 
       // Get AI response
       const aiResponse = response.data.candidates[0].content.parts[0].text;
-      console.log(aiResponse)
 
       // Improved section extraction with more reliable regex patterns
       const extractBetweenHeadings = (text, heading, nextHeadings) => {
@@ -266,7 +265,6 @@ function Overview({ showAlert, fetchInfo }) {
         }
       });
   
-      console.log("Save response:", response.data);
       
       // Set success state
       setIsSaving(false);

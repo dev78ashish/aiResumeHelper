@@ -1,4 +1,4 @@
-import { ArrowUp, Award, FileText } from 'lucide-react';
+import { ArrowUp, Award, FileText, UserCircle2 } from 'lucide-react';
 import React from 'react';
 
 const Profile = ({ allDetails }) => {
@@ -10,12 +10,14 @@ const Profile = ({ allDetails }) => {
         { name: 'Tailwind CSS', level: 80, trending: true }
     ];
 
+    console.log(allDetails.jobRoles)
 
     return (
         <div className="space-y-6">
             <div className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900">Profile Details</h3>
+                <div className="flex items-center p-6 border-b border-gray-200">
+                    <UserCircle2 className="w-5 h-5 text-indigo-500 mr-2" />
+                    <h3 className="text-xl font-bold text-gray-900">Profile Details</h3>
                 </div>
                 <div className="p-6">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
@@ -84,6 +86,32 @@ const Profile = ({ allDetails }) => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-md p-6 transition-all transform hover:shadow-lg">
+                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <Award className="w-5 h-5 text-indigo-500 mr-2" />
+                    Recommended Job Roles
+                </h2>
+                {allDetails.jobRoles && allDetails.jobRoles.length > 0 ? (
+                    <p>These job roles were extracted from your resume with the help of AI.</p>
+                ) : (
+                    <p>Please upload your resume in AI Resume Helper and save your profile details to see your recommended job roles.</p>
+                )}
+                <div className="flex flex-wrap gap-2 mt-4">
+                    {allDetails.jobRoles.length > 0 ? (
+                        allDetails.jobRoles.map((role, index) => (
+                            <span
+                                key={index}
+                                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 border border-indigo-200 transform transition-all hover:-translate-y-1 hover:shadow"
+                            >
+                                {role}
+                            </span>
+                        ))
+                    ) : (
+                        <p className="text-sm text-gray-500">No specific roles recommended.</p>
+                    )}
                 </div>
             </div>
 
