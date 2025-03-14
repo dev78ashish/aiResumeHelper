@@ -124,7 +124,6 @@ const Signup = ({ showAlert }) => {
 
     try {
       const response = await axios.post(url, formData);
-      // console.log("Response:", response.data);
       navigate("/login");
       showAlert(`Account created successfully with username: ${formData.username}`, "success");
     } catch (error) {
@@ -144,18 +143,40 @@ const Signup = ({ showAlert }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* Decorative illustrations */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full filter blur-3xl opacity-10"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-10"></div>
+      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-cyan-500 rounded-full filter blur-3xl opacity-5"></div>
+      
+      {/* Code illustration */}
+      <div className="hidden lg:block absolute right-10 top-1/3 transform translate-y-10 opacity-80">
+        <svg width="150" height="150" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="#4F46E5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M9 10.5L7.5 12L9 13.5" stroke="#4F46E5" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M14.5 10.5L16 12L14.5 13.5" stroke="#4F46E5" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 9L11 15" stroke="#4F46E5" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
 
-      <div className="max-w-md mx-auto px-4 py-16">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="max-w-md w-full mx-auto relative z-10">
+        <div className="bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Create an account</h2>
-            <p className="text-gray-600 mt-2">Start your journey with SkillSync</p>
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-blue-600 rounded-full blur-lg opacity-60"></div>
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full p-3 relative">
+                  <User className="h-8 w-8 text-white" />
+                </div>
+              </div>
+            </div>
+            <h2 className="text-3xl font-bold text-white">Create an account</h2>
+            <p className="text-gray-400 mt-2">Start your journey with SkillSync</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Username
               </label>
               <div className="relative">
@@ -163,12 +184,13 @@ const Signup = ({ showAlert }) => {
                 <input
                   type="text"
                   required
-                  className={`block w-full pl-10 pr-10 py-2 border ${isUsernameAvailable === true
+                  className={`block w-full pl-10 pr-10 py-2 bg-gray-900 border ${
+                    isUsernameAvailable === true
                       ? 'border-green-500 focus:ring-green-500'
                       : isUsernameAvailable === false
                         ? 'border-red-500 focus:ring-red-500'
-                        : 'border-gray-300 focus:ring-blue-600'
-                    } rounded-lg focus:ring-2 focus:border-transparent`}
+                        : 'border-gray-700 focus:ring-blue-600'
+                  } rounded-lg focus:ring-2 focus:border-transparent text-white`}
                   placeholder="Enter your username"
                   value={formData.username}
                   onChange={handleUsernameChange}
@@ -176,7 +198,7 @@ const Signup = ({ showAlert }) => {
                 />
                 {isCheckingUsername ? (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
                   </div>
                 ) : isUsernameAvailable === true ? (
                   <Check className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 h-5 w-5" />
@@ -185,19 +207,20 @@ const Signup = ({ showAlert }) => {
                 ) : null}
               </div>
               {usernameMessage && (
-                <p className={`mt-2 text-sm ${isUsernameAvailable === true
-                    ? 'text-green-600'
+                <p className={`mt-2 text-sm ${
+                  isUsernameAvailable === true
+                    ? 'text-green-500'
                     : isUsernameAvailable === false
-                      ? 'text-red-600'
-                      : 'text-gray-500'
-                  }`}>
+                      ? 'text-red-500'
+                      : 'text-gray-400'
+                }`}>
                   {usernameMessage}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email address
               </label>
               <div className="relative">
@@ -205,7 +228,7 @@ const Signup = ({ showAlert }) => {
                 <input
                   type="email"
                   required
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="block w-full pl-10 pr-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white"
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -214,7 +237,7 @@ const Signup = ({ showAlert }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -222,7 +245,7 @@ const Signup = ({ showAlert }) => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="block w-full pl-10 pr-10 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent text-white"
                   placeholder="Create a password"
                   value={formData.password}
                   onChange={handlePasswordChange}
@@ -230,17 +253,17 @@ const Signup = ({ showAlert }) => {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               <div className="mt-2 space-y-1">
-                <p className={`text-sm ${passwordValidation.hasMinLength ? 'text-green-600' : 'text-gray-500'}`}>
+                <p className={`text-sm ${passwordValidation.hasMinLength ? 'text-green-500' : 'text-gray-400'}`}>
                   {passwordValidation.hasMinLength ? '✓' : '○'} Must be at least 5 characters long
                 </p>
-                <p className={`text-sm ${passwordValidation.hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
+                <p className={`text-sm ${passwordValidation.hasNumber ? 'text-green-500' : 'text-gray-400'}`}>
                   {passwordValidation.hasNumber ? '✓' : '○'} Must contain at least 1 number
                 </p>
               </div>
@@ -250,15 +273,15 @@ const Signup = ({ showAlert }) => {
               <input
                 type="checkbox"
                 required
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-700 rounded bg-gray-900"
               />
-              <label className="ml-2 block text-sm text-gray-700">
+              <label className="ml-2 block text-sm text-gray-300">
                 I agree to the{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-500">
+                <a href="#" className="text-blue-400 hover:text-blue-300">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-500">
+                <a href="#" className="text-blue-400 hover:text-blue-300">
                   Privacy Policy
                 </a>
               </label>
@@ -266,14 +289,20 @@ const Signup = ({ showAlert }) => {
 
             <button
               type="submit"
-              className={`disabled:bg-indigo-400 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white ${isFormValid
-                  ? 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-                  : 'bg-gray-400 cursor-not-allowed'
-                }`}
+              className={`relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white ${
+                isFormValid
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500'
+                  : 'bg-gray-600 cursor-not-allowed'
+              } overflow-hidden`}
               disabled={loading || !isFormValid}
             >
+              {isFormValid && !loading && (
+                <span className="absolute inset-0 overflow-hidden">
+                  <span className="absolute -left-40 -top-40 h-96 w-96 blur-3xl bg-gradient-to-r from-blue-400 to-indigo-400 opacity-30 mix-blend-screen transform rotate-45 animate-pulse"></span>
+                </span>
+              )}
               {loading ? (
-                <span className="flex items-center">
+                <span className="flex items-center relative z-10">
                   <svg className="mr-2 h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -281,17 +310,24 @@ const Signup = ({ showAlert }) => {
                   Creating account...
                 </span>
               ) : (
-                "Create Account"
+                <span className="relative z-10">Create account</span>
               )}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-gray-400">
               Already have an account?{' '}
-              <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500" >
-                Sign in
+              <Link to="/login" className="text-blue-500 hover:text-blue-400 font-medium">
+                Log in
               </Link>
+            </p>
+          </div>
+
+          <div className="mt-8 border-t border-gray-700 pt-6">
+            <p className="text-xs text-gray-500 text-center">
+              By signing up, you agree to our Terms of Service and Privacy Policy.
+              We'll occasionally send you account related emails.
             </p>
           </div>
         </div>
@@ -299,5 +335,6 @@ const Signup = ({ showAlert }) => {
     </div>
   );
 };
+
 
 export default Signup;
