@@ -15,21 +15,16 @@ const ForgotPassword = () => {
     navigate("/login");
   }
 
-  // Mock API call to fetch user email
   const fetchUserEmail = async (username) => {
-    // In a real app, this would be an API call
     setLoading(true);
     
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Mock response - in real app, this would come from your backend
     const mockEmail = 'developer@example.com';
     setLoading(false);
     return mockEmail;
   };
 
-  // Create masked email (de*************m)
   const maskEmail = (email) => {
     if (!email || email.length < 4) return '';
     const firstTwoChars = email.substring(0, 2);
@@ -38,7 +33,6 @@ const ForgotPassword = () => {
     return `${firstTwoChars}${maskedPart}${lastChar}`;
   };
 
-  // Handle username submission
   const handleUsernameSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim()) {
@@ -57,7 +51,6 @@ const ForgotPassword = () => {
     }
   };
 
-  // Handle email verification
   const handleEmailVerification = async (e) => {
     e.preventDefault();
     if (!userEmail.trim()) {
@@ -69,7 +62,6 @@ const ForgotPassword = () => {
       setError('');
       setLoading(true);
       
-      // Simulate sending password reset email
       await new Promise(resolve => setTimeout(resolve, 1500));
       setLoading(false);
       setStep(3);

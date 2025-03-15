@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff, Lock, Mail, User, AlertTriangle, Save, Trash2, Loader, Info, ShieldCheck } from 'lucide-react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 
 const AccountSettings = ({ showAlert }) => {
-  // State management
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
@@ -19,9 +17,7 @@ const AccountSettings = ({ showAlert }) => {
 
   const { logout } = useAuth();
 
-  const navigate = useNavigate();
 
-  // Sample user data (in a real app, this would come from props or context)
   const [userData, setUserData] = useState();
 
   const validateEmail = (email) => {
@@ -57,10 +53,10 @@ const AccountSettings = ({ showAlert }) => {
 
       const response = await axios.put(
         url,
-        { email: newEmail }, // Request body
+        { email: newEmail },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Corrected header
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -95,9 +91,9 @@ const AccountSettings = ({ showAlert }) => {
 
       await axios.put(
         url,
-        { 
+        {
           email: userData.email,
-          password: newPassword 
+          password: newPassword
         },
         {
           headers: {
@@ -119,26 +115,26 @@ const AccountSettings = ({ showAlert }) => {
   // Handle account deletion
   const handleDeleteAccount = async () => {
     setIsDeletingAccount(true);
-  
+
     try {
       const url = `${import.meta.env.VITE_APP_URL}/user/delete`;
-      const token = sessionStorage.getItem("token"); // Retrieve JWT token
-  
+      const token = sessionStorage.getItem("token");
+
       if (!token) {
         alert("Unauthorized: No token found.");
         setIsDeletingAccount(false);
         return;
       }
-  
+
       const response = await axios.delete(url, {
         headers: {
-          Authorization: `Bearer ${token}` // Attach JWT token
+          Authorization: `Bearer ${token}`
         },
       });
-  
+
       if (response.status === 200) {
-        showAlert("Account deleted successfully!","warning");
-        logout(); // Remove token after account deletion
+        showAlert("Account deleted successfully!", "error");
+        logout();
       }
     } catch (error) {
       alert("Error deleting account: " + (error.response?.data || error.message));
@@ -148,28 +144,28 @@ const AccountSettings = ({ showAlert }) => {
   };
 
   return (
-    <div className="w-full p-6 bg-gray-50">
+    <div className="w-full p-6 bg-gray-900">
       <div className="max-w-5xl mx-auto">
         {/* Profile Information */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
           <div className="flex items-center mb-4">
-            <User className="h-8 w-8 text-blue-500 mr-3" />
-            <h2 className="text-xl font-semibold text-gray-700">Profile Information</h2>
+            <User className="h-8 w-8 text-blue-400 mr-3" />
+            <h2 className="text-xl font-semibold text-gray-200">Profile Information</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Username */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Username</label>
               <div className="relative">
                 <input
                   type="text"
                   value={userData?.username || ""}
                   disabled
-                  className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 cursor-not-allowed"
                 />
-                <p className="mt-2 items-center flex text-sm text-gray-500">
-                  <Info size={12} className="mr-1 text-blue-700" />
+                <p className="mt-2 items-center flex text-sm text-gray-400">
+                  <Info size={12} className="mr-1 text-blue-400" />
                   Username cannot be changed
                 </p>
               </div>
@@ -177,16 +173,16 @@ const AccountSettings = ({ showAlert }) => {
 
             {/* Current Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Current Email</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Current Email</label>
               <div className="relative">
                 <input
                   type="email"
                   value={userData?.email || ""}
                   disabled
-                  className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 cursor-not-allowed"
                 />
-                <p className="mt-2 items-center flex text-sm text-gray-500">
-                  <ShieldCheck size={12} className="mr-1 text-blue-700" />
+                <p className="mt-2 items-center flex text-sm text-gray-400">
+                  <ShieldCheck size={12} className="mr-1 text-blue-400" />
                   Used for account recovery and notifications
                 </p>
               </div>
@@ -195,23 +191,23 @@ const AccountSettings = ({ showAlert }) => {
         </div>
 
         {/* Email Update */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
           <div className="flex items-center mb-4">
-            <Mail className="h-8 w-8 text-green-500 mr-3" />
-            <h2 className="text-xl font-semibold text-gray-700">Update Email</h2>
+            <Mail className="h-8 w-8 text-green-400 mr-3" />
+            <h2 className="text-xl font-semibold text-gray-200">Update Email</h2>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">New Email Address</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">New Email Address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-gray-500" />
                 </div>
                 <input
                   type="email"
                   placeholder="Enter new email address"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-200"
                   value={newEmail || ""}
                   onChange={(e) => {
                     const email = e.target.value;
@@ -225,7 +221,7 @@ const AccountSettings = ({ showAlert }) => {
             <button
               onClick={handleEmailUpdate}
               disabled={!isValidEmail || isUpdatingEmail}
-              className="flex items-center bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 disabled:bg-green-300"
+              className="flex items-center bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 disabled:bg-green-900 disabled:text-gray-400"
             >
               {isUpdatingEmail ? (
                 <>
@@ -243,20 +239,20 @@ const AccountSettings = ({ showAlert }) => {
         </div>
 
         {/* Password Update */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
           <div className="flex items-center mb-4">
-            <Lock className="h-8 w-8 text-blue-500 mr-3" />
-            <h2 className="text-xl font-semibold text-gray-700">Change Password</h2>
+            <Lock className="h-8 w-8 text-blue-400 mr-3" />
+            <h2 className="text-xl font-semibold text-gray-200">Change Password</h2>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter new password"
-                  className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg"
+                  className="w-full pl-3 pr-10 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                 />
@@ -271,12 +267,12 @@ const AccountSettings = ({ showAlert }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Confirm New Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirm new password"
-                  className="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg"
+                  className="w-full pl-3 pr-10 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
@@ -288,13 +284,13 @@ const AccountSettings = ({ showAlert }) => {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
+              {passwordError && <p className="text-red-400 text-sm mt-1">{passwordError}</p>}
             </div>
 
             <button
               onClick={handlePasswordUpdate}
               disabled={newPassword !== confirmPassword || isUpdatingPassword || !newPassword}
-              className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition disabled:bg-blue-300"
+              className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition disabled:bg-blue-900 disabled:text-gray-400"
             >
               {isUpdatingPassword ? (
                 <>
@@ -312,30 +308,30 @@ const AccountSettings = ({ showAlert }) => {
         </div>
 
         {/* Delete Account */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
           <div className="flex items-center mb-4">
             <Trash2 className="h-8 w-8 text-red-500 mr-3" />
-            <h2 className="text-xl font-semibold text-gray-700">Delete Account</h2>
+            <h2 className="text-xl font-semibold text-gray-200">Delete Account</h2>
           </div>
 
           {!showDeleteConfirm ? (
             <div>
-              <p className="text-gray-600 mb-4">This action cannot be undone. All account information will be permanently deleted.</p>
+              <p className="text-gray-400 mb-4">This action cannot be undone. All account information will be permanently deleted.</p>
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="flex items-center bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors duration-200"
+                className="flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors duration-200"
               >
                 <Trash2 className="h-5 w-5 mr-2" />
                 Delete Account
               </button>
             </div>
           ) : (
-            <div className="border border-red-200 bg-red-50 p-4 rounded-lg">
+            <div className="border border-red-900 bg-gray-700 p-4 rounded-lg">
               <div className="flex items-start mb-4">
                 <AlertTriangle className="h-6 w-6 text-red-500 mr-2 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-red-700">Warning: This cannot be undone</h3>
-                  <p className="text-red-600 text-sm">All your data, posts, and account information will be permanently deleted.</p>
+                  <h3 className="font-semibold text-red-400">Warning: This cannot be undone</h3>
+                  <p className="text-red-300 text-sm">All your data, posts, and account information will be permanently deleted.</p>
                 </div>
               </div>
 
@@ -343,7 +339,7 @@ const AccountSettings = ({ showAlert }) => {
                 <button
                   onClick={handleDeleteAccount}
                   disabled={isDeletingAccount}
-                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 disabled:bg-red-400"
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 disabled:bg-red-900 disabled:text-gray-400"
                 >
                   {isDeletingAccount ? (
                     <>
@@ -357,7 +353,7 @@ const AccountSettings = ({ showAlert }) => {
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeletingAccount}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg transition-colors duration-200 disabled:bg-gray-200"
+                  className="bg-gray-600 hover:bg-gray-500 text-gray-200 px-6 py-2 rounded-lg transition-colors duration-200 disabled:bg-gray-700 disabled:text-gray-500"
                 >
                   Cancel
                 </button>

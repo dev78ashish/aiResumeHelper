@@ -32,12 +32,7 @@ const Navbar = ({ showAlert }) => {
               <Link to="/" className="flex items-center text-gray-300 hover:text-blue-400 transition">
                 <Home className="h-5 w-5 mr-1" /> Home
               </Link>
-              <Link to="/features" className="flex items-center text-gray-300 hover:text-blue-400 transition">
-                <Zap className="h-5 w-5 mr-1" /> Features
-              </Link>
-              <Link to="/developers" className="flex items-center text-gray-300 hover:text-blue-400 transition">
-                <Code className="h-5 w-5 mr-1" /> Developers
-              </Link>
+              
             </div>
           </div>
 
@@ -45,9 +40,6 @@ const Navbar = ({ showAlert }) => {
             {/* Auth Buttons */}
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
-                <Link to="/dashboard" className="flex items-center px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium hover:from-blue-700 hover:to-blue-600 transition shadow-md">
-                  Dashboard
-                </Link>
                 <button
                   onClick={handleLogOut}
                   className="flex items-center px-4 py-2 rounded-md border border-red-400 text-red-400 font-medium hover:bg-red-900 hover:bg-opacity-30 transition"
@@ -88,18 +80,9 @@ const Navbar = ({ showAlert }) => {
             <Link to="/" className="flex items-center py-2 text-gray-300 hover:text-blue-400 transition">
               <Home className="h-5 w-5 mr-2" /> Home
             </Link>
-            <Link to="/features" className="flex items-center py-2 text-gray-300 hover:text-blue-400 transition">
-              <Zap className="h-5 w-5 mr-2" /> Features
-            </Link>
-            <Link to="/developers" className="flex items-center py-2 text-gray-300 hover:text-blue-400 transition">
-              <Code className="h-5 w-5 mr-2" /> Developers
-            </Link>
             
             {isAuthenticated ? (
               <>
-                <Link to="/dashboard" className="flex items-center py-2 text-blue-400 font-medium hover:text-blue-300 transition">
-                  Dashboard
-                </Link>
                 <button
                   onClick={handleLogOut}
                   className="flex items-center py-2 text-red-400 font-medium hover:text-red-300 transition w-full text-left"

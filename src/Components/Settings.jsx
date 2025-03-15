@@ -26,6 +26,9 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
         female3, male4, female4, male5, female5
     ];
 
+    const getImage = (key) => avatarOptions[key] || null; // Returns `null` for invalid keys
+
+
     const handleSave = async () => {
         try {
             setSaveStatus(true);
@@ -59,14 +62,14 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
 
     return (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-            <div className="p-6 sm:p-8 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-                <h3 className="text-xl font-semibold text-gray-900">Settings</h3>
-                <p className="text-sm text-gray-600 mt-1">Manage your account preferences and personal information</p>
+        <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
+            <div className="p-6 sm:p-8 border-b border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800">
+                <h3 className="text-xl font-semibold text-gray-100">Settings</h3>
+                <p className="text-sm text-gray-400 mt-1">Manage your account preferences and personal information</p>
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200 bg-white">
+            <div className="border-b border-gray-700 bg-gray-800">
                 <div className="flex overflow-x-auto scrollbar-hide">
                     {[
                         { id: 'account', label: 'Account Details', icon: <User className="h-4 w-4 mr-2" /> },
@@ -78,10 +81,10 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                             onMouseEnter={() => setHoveredTab(tab.id)}
                             onMouseLeave={() => setHoveredTab(null)}
                             className={`px-6 py-4 text-sm font-medium transition-all duration-200 flex items-center ${activeTab === tab.id
-                                ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50'
+                                ? 'border-b-2 border-blue-500 text-blue-400 bg-gray-700'
                                 : hoveredTab === tab.id
-                                    ? 'text-gray-700 bg-gray-50'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                    ? 'text-gray-200 bg-gray-700'
+                                    : 'text-gray-400 hover:text-gray-200'
                                 }`}
                         >
                             {tab.icon}
@@ -93,21 +96,21 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
             {/* Account Details Tab */}
             {activeTab === 'account' && (
-                <div className="p-6 sm:p-8">
+                <div className="p-6 sm:p-8 bg-gray-800">
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2">
                         {/* Username (Non-editable) */}
                         <div className="space-y-2">
-                            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="username" className="block text-sm font-medium text-gray-200">
                                 Username <span className="text-xs text-gray-500">(cannot be changed)</span>
                             </label>
                             <div className="relative rounded-md shadow-sm group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-5 w-5 text-gray-400" />
+                                    <User className="h-5 w-5 text-gray-500" />
                                 </div>
                                 <input
                                     type="text"
                                     id="username"
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 bg-gray-50 cursor-not-allowed sm:text-sm"
+                                    className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-lg text-gray-300 placeholder-gray-500 bg-gray-700 cursor-not-allowed sm:text-sm"
                                     value={newDetails.username || "username"}
                                     disabled
                                 />
@@ -116,17 +119,17 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                         {/* Full Name */}
                         <div className="space-y-2">
-                            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="fullName" className="block text-sm font-medium text-gray-200">
                                 Full Name
                             </label>
                             <div className="relative rounded-md shadow-sm group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
+                                    <User className="h-5 w-5 text-gray-500 group-hover:text-blue-400" />
                                 </div>
                                 <input
                                     type="text"
                                     id="fullName"
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                                    className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-lg text-gray-200 placeholder-gray-500 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                                     value={newDetails.fullname || ""}
                                     onChange={(e) => setNewDetails({ ...newDetails, fullname: e.target.value })}
                                 />
@@ -135,13 +138,13 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                         {/* Phone Number */}
                         <div className="space-y-2">
-                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-200">
                                 Phone Number
                             </label>
                             <input
                                 type="tel"
                                 id="phone"
-                                className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                                className="block w-full px-3 py-2 border border-gray-600 rounded-lg shadow-sm text-gray-200 placeholder-gray-500 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                                 value={newDetails.number || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, number: e.target.value })}
                             />
@@ -149,13 +152,13 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                         {/* Location */}
                         <div className="space-y-2">
-                            <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="location" className="block text-sm font-medium text-gray-200">
                                 Location
                             </label>
                             <input
                                 type="text"
                                 id="location"
-                                className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                                className="block w-full px-3 py-2 border border-gray-600 rounded-lg shadow-sm text-gray-200 placeholder-gray-500 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                                 value={newDetails.location || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, location: e.target.value })}
                             />
@@ -163,13 +166,13 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                         {/* Job Title */}
                         <div className="space-y-2">
-                            <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-200">
                                 Job Title
                             </label>
                             <input
                                 type="text"
                                 id="jobTitle"
-                                className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                                className="block w-full px-3 py-2 border border-gray-600 rounded-lg shadow-sm text-gray-200 placeholder-gray-500 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                                 value={newDetails.title || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, title: e.target.value })}
                             />
@@ -177,12 +180,12 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                         {/* Years of Experience - Dropdown */}
                         <div className="space-y-2">
-                            <label htmlFor="experience" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="experience" className="block text-sm font-medium text-gray-200">
                                 Years of Experience
                             </label>
                             <select
                                 id="experience"
-                                className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                                className="block w-full px-3 py-2 border border-gray-600 rounded-lg shadow-sm text-gray-200 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                                 value={newDetails.experience || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, experience: e.target.value })}
                             >
@@ -196,13 +199,13 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                         {/* Education */}
                         <div className="space-y-2">
-                            <label htmlFor="education" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="education" className="block text-sm font-medium text-gray-200">
                                 Education
                             </label>
                             <input
                                 type="text"
                                 id="education"
-                                className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
+                                className="block w-full px-3 py-2 border border-gray-600 rounded-lg shadow-sm text-gray-200 placeholder-gray-500 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200"
                                 value={newDetails.qualification || ""}
                                 onChange={(e) => setNewDetails({ ...newDetails, qualification: e.target.value })}
                                 placeholder="e.g., B.Tech, MCA, MBA"
@@ -211,13 +214,13 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                         {/* Availability Dropdown (Internship, Full-Time, Part-Time) */}
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">Availability</label>
+                            <label className="block text-sm font-medium text-gray-200">Availability</label>
                             <div className="flex space-x-2">
                                 <button
                                     type="button"
                                     className={`py-2 px-4 border rounded-lg text-sm font-medium transition-all duration-200 ${newDetails.availability === 'Internship'
                                         ? 'bg-blue-600 text-white'
-                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        : 'border-gray-600 text-gray-300 hover:bg-gray-700'
                                         }`}
                                     onClick={() => setNewDetails({ ...newDetails, availability: 'Internship' })}
                                 >
@@ -227,7 +230,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                                     type="button"
                                     className={`py-2 px-4 border rounded-lg text-sm font-medium transition-all duration-200 ${newDetails.availability === 'Full-Time'
                                         ? 'bg-blue-600 text-white'
-                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        : 'border-gray-600 text-gray-300 hover:bg-gray-700'
                                         }`}
                                     onClick={() => setNewDetails({ ...newDetails, availability: 'Full-Time' })}
                                 >
@@ -237,7 +240,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                                     type="button"
                                     className={`py-2 px-4 border rounded-lg text-sm font-medium transition-all duration-200 ${newDetails.availability === 'Part-Time'
                                         ? 'bg-blue-600 text-white'
-                                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        : 'border-gray-600 text-gray-300 hover:bg-gray-700'
                                         }`}
                                     onClick={() => setNewDetails({ ...newDetails, availability: 'Part-Time' })}
                                 >
@@ -249,18 +252,18 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                     {/* Profile Picture Section */}
                     <div className="mt-8">
-                        <h4 className="text-md font-medium text-gray-900 mb-4">Profile Picture</h4>
+                        <h4 className="text-md font-medium text-gray-200 mb-4">Profile Picture</h4>
                         <div className="flex items-center space-x-6">
-                            <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
+                            <div className="h-16 w-16 rounded-full bg-gray-700 flex items-center justify-center">
                                 {newDetails.avatar ? (
-                                    <img src={newDetails.avatar} alt='UserIcon' />
+                                    <img src={getImage(newDetails.avatar)} alt='UserIcon' />
                                 ) : (
-                                    <User className="h-8 w-8 text-blue-500" />
+                                    <User className="h-8 w-8 text-blue-400" />
                                 )}
                             </div>
                             <button
                                 onClick={() => setShowAvatarModal(true)}
-                                className="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                                className="cursor-pointer bg-gray-700 py-2 px-4 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-600 transition-all duration-200"
                             >
                                 Choose Avatar
                             </button>
@@ -269,27 +272,33 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
 
                     {/* Avatar Modal */}
                     {showAvatarModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                            <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-lg font-medium text-gray-900">Choose Avatar</h3>
+                                    <h3 className="text-lg font-medium text-gray-200">Choose Avatar</h3>
                                     <button
                                         onClick={() => setShowAvatarModal(false)}
-                                        className="text-gray-400 hover:text-gray-500"
+                                        className="text-gray-400 hover:text-gray-300"
                                     >
                                         <X className="h-5 w-5" />
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-5 gap-4">
-                                    {avatarOptions.map((avatar) => (
+                                    {avatarOptions.map((avatar, key) => (
                                         <button
                                             key={avatar}
-                                            onClick={() => handleAvatarSelect(avatar)}
-                                            className={`h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center hover:bg-blue-200 transition-colors duration-200 ${newDetails.avatar === avatar ? 'ring-2 ring-blue-500' : ''
-                                                }`}
+                                            onClick={() => handleAvatarSelect(key)}
+                                            className={`relative h-16 w-16 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-600 hover:scale-105 transition-transform duration-200 overflow-hidden 
+                                            ${newDetails.avatar === key ? 'outline outline-4 outline-blue-500' : ''}`}
                                         >
-                                            <img src={avatar} alt={avatar} />
+                                            {/* {console.log(key)} */}
+                                            <img src={avatar} alt={key} className="w-full h-full object-cover" />
+
+                                            {newDetails.avatar === avatar && (
+                                                <span className="absolute inset-0 rounded-full border-2 border-blue-500 animate-pulse"></span>
+                                            )}
                                         </button>
+
                                     ))}
                                 </div>
                             </div>
@@ -297,8 +306,8 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                     )}
 
                     {/* Buttons */}
-                    <div className="p-6 bg-gray-50 border-t border-gray-200 flex justify-between mt-8">
-                        <button type="button" className="py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200">
+                    <div className="p-6 bg-gray-900 border-t border-gray-700 flex justify-between mt-8">
+                        <button type="button" className="py-2 px-4 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 transition-all duration-200">
                             Cancel
                         </button>
                         <button
@@ -326,12 +335,10 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                 </div>
             )}
 
-
             {/* Security Tab */}
             {activeTab === 'security' && (
                 <AccountSettings showAlert={showAlert} />
             )}
-
         </div>
     );
 };
