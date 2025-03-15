@@ -34,6 +34,7 @@ const Dashboard = ({ showAlert }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState('');
   const [allDetails, setAllDetails] = useState(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
   const { logout } = useAuth();
 
   const navItems = [
@@ -54,13 +55,16 @@ const Dashboard = ({ showAlert }) => {
     const url = `${import.meta.env.VITE_APP_URL}/userinfo`;
     const token = sessionStorage.getItem("token");
     try {
+      setDetailsLoading(true);
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`
         },
       });
       setAllDetails(response.data);
+      setDetailsLoading(false);
     } catch (e) {
+      setDetailsLoading(true);
       console.log(e);
     }
   }
@@ -134,7 +138,7 @@ const Dashboard = ({ showAlert }) => {
                 onClick={() => {
                   setActiveTab(item.id);
                   setSidebarOpen(false);
-                }}
+                }} disabled={detailsLoading}
                 className={`flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg ${activeTab === item.id
                     ? 'bg-gray-700 text-blue-400'
                     : 'text-gray-300 hover:bg-gray-700 hover:text-blue-400'

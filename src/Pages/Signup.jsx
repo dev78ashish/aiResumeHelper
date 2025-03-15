@@ -46,7 +46,8 @@ const Signup = ({ showAlert }) => {
       });
 
       // API now returns "yes" if username exists, "no" if available
-      const exists = response.data === "yes";
+      console.log(response.data)
+      const exists = response.data.exists === "yes";
       setIsUsernameAvailable(!exists);
       setUsernameMessage(exists ? 'Username is already taken' : 'Username is available');
     } catch (error) {

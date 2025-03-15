@@ -256,7 +256,7 @@ const Settings = ({ allDetails, fetchInfo, showAlert }) => {
                         <div className="flex items-center space-x-6">
                             <div className="h-16 w-16 rounded-full bg-gray-700 flex items-center justify-center">
                                 {newDetails.avatar ? (
-                                    <img src={getImage(newDetails.avatar)} alt='UserIcon' />
+                                    <img src={getImage(newDetails.avatar)} alt='UserIcon' />                                    
                                 ) : (
                                     <User className="h-8 w-8 text-blue-400" />
                                 )}

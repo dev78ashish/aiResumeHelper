@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight, CheckCircle, Briefcase, LineChart, ChevronDown, X, Mail, Moon, Star, Code, Shield, Users } from 'lucide-react';
 import home from '../assets/home.png';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
   const [showDemo, setShowDemo] = useState(false);
@@ -12,6 +13,8 @@ const LandingPage = () => {
     setSubmitted(true);
     setEmail('');
   };
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 overflow-x-hidden">
@@ -341,7 +344,7 @@ const LandingPage = () => {
               </p>
             </div>
             <div className="mt-8 lg:mt-0 lg:flex-shrink-0">
-              <button className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:text-lg">
+              <button className="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:text-lg" onClick={() => navigate("/signup")}>
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />
               </button>
