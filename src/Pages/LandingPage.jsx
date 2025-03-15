@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, CheckCircle, Briefcase, LineChart, ChevronDown, X, Mail, Moon, Star, Code, Shield, Users } from 'lucide-react';
+import home from '../assets/home.png';
 
 const LandingPage = () => {
   const [showDemo, setShowDemo] = useState(false);
@@ -54,7 +55,7 @@ const LandingPage = () => {
                 </div>
                 <img
                   className="w-full h-auto"
-                  src="/api/placeholder/600/400"
+                  src={home}
                   alt="Dashboard preview"
                 />
               </div>
