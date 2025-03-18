@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "/api/:path*",
-        "destination": "${BACKEND_URL}/:path*"
+        "destination": "http://springboot-env.eba-5kdqaupi.ap-south-1.elasticbeanstalk.com/:path*"
       }
     ]
   }
